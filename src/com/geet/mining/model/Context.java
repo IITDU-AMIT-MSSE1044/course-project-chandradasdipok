@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -53,6 +54,7 @@ public class Context {
 	
 	// set transaction types
 	public static void setTransactionTypes(List<Transaction>transactions){
+		events = new HashSet<String>();
 		for (Transaction transaction : transactions) {
 			TransactionType transactionType = null;
 			if (transactionTypesMap.containsKey(transaction.getTransactionID())) {
@@ -68,13 +70,53 @@ public class Context {
 			}else{
 				transactionType.succeed++;
 			}
+			// set the full event set
+			if (!events.contains(transaction.getEventID())) {
+				events.add(transaction.getEventID());
+			}			
+			// set the transaction types
 			transactionTypesMap.put(transaction.getTransactionID(), transactionType);
+			
+		}
+	}
+	// build the context table
+	public static void setContextTable(){
+		CONTEXT_TABLE = new boolean [transactionTypesMap.size()][events.size()];
+		// event set is converted to array
+		String [] eventsArray = new String[events.size()]; 
+		int flag =0;
+		for (String event : events) {
+			eventsArray[flag] = event;
+			flag++;
+		}
+		// transactiontypes keys set is converted into an array
+		flag = 0;
+		String [] transactionTypeArray = new String[transactionTypesMap.keySet().size()]; 
+		for (String transaction : transactionTypesMap.keySet()) {
+			transactionTypeArray[flag] = transaction;
+			flag++;
+		}
+		flag = 0;
+		for (int i = 0; i < transactionTypeArray.length; i++) {
+			for (int j = 0; j < eventsArray.length; j++) {
+				if (transactionTypesMap.get(transactionTypeArray[i]).eventSet.contains(eventsArray[j])) {
+					CONTEXT_TABLE[i][j] = true;
+				}
+			}
 		}
 	}
 	
-	// build the context table
-	
-	
+	static void printContextTable(){
+		System.out.println(events.toString());
+		System.out.println(transactionTypesMap.keySet().toString());
+		for (int i = 0; i < CONTEXT_TABLE.length; i++) {
+			for (int j = 0; j < CONTEXT_TABLE[i].length; j++) {
+				// print 1 for true and 0 for false
+				System.out.print((CONTEXT_TABLE[i][j]?1:0)+" ");
+			}
+			System.out.println();
+		}
+	}	
 	public static void main(String[] args) {
 		
 		
@@ -86,7 +128,8 @@ public class Context {
 		for (String key : transactionTypesMap.keySet()) {
 			System.out.println(transactionTypesMap.get(key));
 		}
+		setContextTable();
+		printContextTable();
 	}
-	
 
 }
