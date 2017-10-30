@@ -1,2 +1,2 @@
 # mining_historical_issue_repositories
-This repository will be used to implement the mining based approach proposed by the paper titled "Mining historical issue repositories to heal large-scale online service systems". The paper can be found <a href="" target="_blank">here</a>.
+This repository will be used to implement the mining based approach proposed by the paper titled "Mining historical issue repositories to heal large-scale online service systems". The paper can be found <a href="https://www.researchgate.net/profile/Tao_Xie13/publication/269692153_Mining_Historical_Issue_Repositories_to_Heal_Large-Scale_Online_Service_Systems/links/550c7db80cf2128741612908.pdf" target="_blank">here</a>.
