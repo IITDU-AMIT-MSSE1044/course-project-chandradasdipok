@@ -1,5 +1,8 @@
 package com.geet.mining.model;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,8 +14,19 @@ import java.util.Map;
  */
 public class Issue implements Comparable<Issue>{
 	 
+	
+	public Issue(){
+		transactions = new ArrayList<Transaction>();
+		transactionModules = new HashMap<String,TransactionModule>();
+		signatures = new HashMap<Term,Double>();
+		healingAction = null;
+	}
+	
+	// failed transaction and succeeded transactions given a issue
+	
+	int fail=0,succeed=0;
 	// log messages of an issue
-	private String log;
+	private List<Transaction>transactions;
 	// healing action of an issue
 	private String  healingAction;
 	// the signatures of an issue
@@ -22,12 +36,16 @@ public class Issue implements Comparable<Issue>{
 	// and We
 	private Map<Term,Double> signatures;
 	
+	// each issue is consists of some modules named 
+	private Map<String,TransactionModule> transactionModules = new HashMap<String,TransactionModule>();	
+
 	// latest cosine value with another issue
 	private double cosine=-1;
 	public double getCosine() {
 		return cosine;
 	}
 
+	// set cosine similarity value between two documents
 	public void setCosine(Issue issue) {
 		this.cosine = doubleDotProduct(issue)/(scalarValue()*issue.scalarValue());
 	}
@@ -58,4 +76,22 @@ public class Issue implements Comparable<Issue>{
 		}
 		return Math.sqrt(scalarValue);
 	}
+
+	public List<Transaction> getTransactions() {
+		return transactions;
+	}
+
+	public void setLog(List<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
+	public Map<String, TransactionModule> getTransactionModules() {
+		return transactionModules;
+	}
+
+	public void setTransactionModules(Map<String, TransactionModule> transactionModules) {
+		this.transactionModules = transactionModules;
+	}
+
+	
 }

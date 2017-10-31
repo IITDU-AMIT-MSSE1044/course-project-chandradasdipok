@@ -2,30 +2,35 @@ package com.geet.mining.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
 import com.geet.mining.model.Transaction.TransactionBuilder;
 
 /**
- * 
  * @author chandradasdipok
- * This class maintains the context table of transactions and events
+ * This class maintains the context
+ * Each context has an issue
  */
 public class Context {
 
-	static Set<String> events;
-	static Map<String,TransactionType> transactionTypesMap = new HashMap<String,TransactionType>();
-	static  boolean [][] CONTEXT_TABLE;
+	private Set<String> events;
+	private Issue issue;
+	private boolean [][] CONTEXT_TABLE;
+
+	// read issues from file in text format
+	public void readAndSetIssueFromFile(String filepath){
+		issue = new Issue();
+		readTransactionsFromFile(filepath);
+		setContextTable();
+		printContextTable();
+	}
 	
 	// read transactions
-	public static List<Transaction> readTransactionsFromFile(String filepath){
-		List<Transaction> transactions = new ArrayList<Transaction>();
+	private void readTransactionsFromFile(String filepath){
+		events = new HashSet<String>();
 		File inputFile = new File(filepath);
 		Scanner inputScanner=null;
 		try {
@@ -40,7 +45,9 @@ public class Context {
 						transactionBuilder.transactionStatus(Status.SUCCESS);						
 					}
 					transactionBuilder.time(tokens[0]).event(tokens[1]).transactionID(tokens[2]).log(tokens[3]);
-					transactions.add(transactionBuilder.build());
+					Transaction transaction = transactionBuilder.build();
+					issue.getTransactions().add(transaction);
+					setTransactionModules(transaction);
 				}
 			}
 		} catch (FileNotFoundException e) {
@@ -49,39 +56,65 @@ public class Context {
 		finally{
 			inputScanner.close();
 		}
-		return transactions;
 	}
 	
+	// set transaction modules
+	private  void setTransactionModules(Transaction transaction){
+		TransactionModule transactionModule = null;
+		if (issue.getTransactionModules().containsKey(transaction.getTransactionID())) {
+			transactionModule = issue.getTransactionModules().get(transaction.getTransactionID());
+		} else {
+			transactionModule = new TransactionModule();
+			transactionModule.transactionID = (transaction.getTransactionID());
+		}
+		transactionModule.eventSet.add(transaction.getEventID());
+		if (transaction.getTransactionStatus() == Status.FAILURE) {
+			transactionModule.fail++;
+			issue.fail++;
+		} else {
+			transactionModule.succeed++;
+			issue.succeed++;
+		}
+		// set the full event set
+		if (!events.contains(transaction.getEventID())) {
+			events.add(transaction.getEventID());
+		}
+		// set the transaction types
+		issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
+	}
+	
+	@Deprecated
 	// set transaction types
-	public static void setTransactionTypes(List<Transaction>transactions){
+	private void setTransactionModules(List<Transaction>transactions){
 		events = new HashSet<String>();
 		for (Transaction transaction : transactions) {
-			TransactionType transactionType = null;
-			if (transactionTypesMap.containsKey(transaction.getTransactionID())) {
-				transactionType = transactionTypesMap.get(transaction.getTransactionID());
+			TransactionModule transactionModule = null;
+			if (issue.getTransactionModules().containsKey(transaction.getTransactionID())) {
+				transactionModule = issue.getTransactionModules().get(transaction.getTransactionID());
 			}else{
-				transactionType = new TransactionType();
-				transactionType.transactionID=(transaction.getTransactionID());
+				transactionModule = new TransactionModule();
+				transactionModule.transactionID=(transaction.getTransactionID());
 				
 			}
-			transactionType.eventSet.add(transaction.getEventID());
+			transactionModule.eventSet.add(transaction.getEventID());
 			if (transaction.getTransactionStatus()==Status.FAILURE) {
-				transactionType.fail++;
+				transactionModule.fail++;
 			}else{
-				transactionType.succeed++;
+				transactionModule.succeed++;
 			}
 			// set the full event set
 			if (!events.contains(transaction.getEventID())) {
 				events.add(transaction.getEventID());
 			}			
 			// set the transaction types
-			transactionTypesMap.put(transaction.getTransactionID(), transactionType);
+			issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
 			
 		}
 	}
+	
 	// build the context table
-	public static void setContextTable(){
-		CONTEXT_TABLE = new boolean [transactionTypesMap.size()][events.size()];
+	private  void setContextTable(){
+		CONTEXT_TABLE = new boolean [issue.getTransactionModules().size()][events.size()];
 		// event set is converted to array
 		String [] eventsArray = new String[events.size()]; 
 		int flag =0;
@@ -89,26 +122,26 @@ public class Context {
 			eventsArray[flag] = event;
 			flag++;
 		}
-		// transactiontypes keys set is converted into an array
+		// transaction modules keys set is converted into an array
 		flag = 0;
-		String [] transactionTypeArray = new String[transactionTypesMap.keySet().size()]; 
-		for (String transaction : transactionTypesMap.keySet()) {
+		String [] transactionTypeArray = new String[issue.getTransactionModules().keySet().size()]; 
+		for (String transaction : issue.getTransactionModules().keySet()) {
 			transactionTypeArray[flag] = transaction;
 			flag++;
 		}
 		flag = 0;
 		for (int i = 0; i < transactionTypeArray.length; i++) {
 			for (int j = 0; j < eventsArray.length; j++) {
-				if (transactionTypesMap.get(transactionTypeArray[i]).eventSet.contains(eventsArray[j])) {
+				if (issue.getTransactionModules().get(transactionTypeArray[i]).eventSet.contains(eventsArray[j])) {
 					CONTEXT_TABLE[i][j] = true;
 				}
 			}
 		}
 	}
 	
-	static void printContextTable(){
+	private void printContextTable(){
 		System.out.println(events.toString());
-		System.out.println(transactionTypesMap.keySet().toString());
+		System.out.println(issue.getTransactionModules().keySet().toString());
 		for (int i = 0; i < CONTEXT_TABLE.length; i++) {
 			for (int j = 0; j < CONTEXT_TABLE[i].length; j++) {
 				// print 1 for true and 0 for false
@@ -118,18 +151,9 @@ public class Context {
 		}
 	}	
 	public static void main(String[] args) {
-		
-		
-/*		for (Transaction transaction : readTransactionsFromFile("src/com/geet/mining/input/input.txt")) {
-			System.out.println(transaction);
-		}
-*/	
-		setTransactionTypes(readTransactionsFromFile("src/com/geet/mining/input/input.txt"));
-		for (String key : transactionTypesMap.keySet()) {
-			System.out.println(transactionTypesMap.get(key));
-		}
-		setContextTable();
-		printContextTable();
+		Context context = new Context();
+		context.readAndSetIssueFromFile("src/com/geet/mining/input/input.txt");
+		System.out.println(context.issue.fail+" "+context.issue.succeed);
 	}
 
 }
