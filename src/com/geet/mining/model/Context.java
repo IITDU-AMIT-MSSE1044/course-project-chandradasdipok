@@ -180,6 +180,9 @@ public class Context {
 		}
 		return closure;
 	}
+	
+	
+	
 	public static void main(String[] args) {
 		Context context = new Context();
 		context.readAndSetIssueFromFile("src/com/geet/mining/input/coursera.txt");
@@ -189,4 +192,5 @@ public class Context {
 		events.add("e");
 		System.out.println(context.closureOfEvents(events, context.CONTEXT_TABLE));
 	}
+
 }
