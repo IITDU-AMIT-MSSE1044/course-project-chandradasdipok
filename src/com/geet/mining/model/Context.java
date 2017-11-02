@@ -154,39 +154,39 @@ public class Context {
 	private Set<String> closureOfEvents(Set<String> events, boolean[][] contextTable){
 		Set<String> closure = new HashSet<String>();
 		Set<String> transactionsID = new HashSet<String>();
-		// rotate all the events
-		for (String event : events) {
-			// check whether the event is present in the modules of issue
-			for (String transactionModuleKey : issue.getTransactionModules().keySet()) {
-				// if event present in a module store it in TransactionsID
-				if (issue.getTransactionModules().get(transactionModuleKey).eventSet.contains(event)) {
-					transactionsID.add(transactionModuleKey);
+		
+		// collects the transactions which has common attributes i.e., events
+		for (String moduleKey : issue.getTransactionModules().keySet()) {
+			if (issue.getTransactionModules().get(moduleKey).eventSet.containsAll(events)) {
+				transactionsID.add(moduleKey);
+			}
+		}
+		
+		// if the object set of common attributes i.e., events is empty then return all the attributes 
+		if (transactionsID.size() == 0) {
+			return issue.getEvents();
+		} 
+		//other wise take the intersection of all the events of objects
+		else {
+			for (String transactionKey : transactionsID) {
+				if (closure.size() == 0) {
+					// store first module's events as closure
+					closure = issue.getTransactionModules().get(transactionKey).eventSet;
+				} else {
+					// intersection of module's events given transactions with closure 				
+					closure.retainAll(issue.getTransactionModules().get(transactionKey).eventSet);
 				}
 			}
 		}
-		int i = 0;
-		for (String transactionKey : transactionsID) {
-			if (i == 0) {
-				// store first module's events as closure
-				closure = issue.getTransactionModules().get(transactionKey).eventSet;
-			} else {
-				// intersection of module's events given transactions with closure 				
-				closure.retainAll(issue.getTransactionModules().get(transactionKey).eventSet);
-			}
-			i++;
-		}
 		return closure;
 	}
-	
-	
-	
 	public static void main(String[] args) {
 		Context context = new Context();
 		context.readAndSetIssueFromFile("src/com/geet/mining/input/coursera.txt");
 		System.out.println(context.issue.fail+" "+context.issue.succeed);
 		Set<String> events = new HashSet<String>();
-		events.add("a");
+		events.add("d");
+		events.add("e");
 		System.out.println(context.closureOfEvents(events, context.CONTEXT_TABLE));
 	}
-
 }
