@@ -16,7 +16,6 @@ import com.geet.mining.model.Transaction.TransactionBuilder;
  */
 public class Context {
 
-	private Set<String> events;
 	private Issue issue;
 	private boolean [][] CONTEXT_TABLE;
 
@@ -30,7 +29,6 @@ public class Context {
 	
 	// read transactions
 	private void readTransactionsFromFile(String filepath){
-		events = new HashSet<String>();
 		File inputFile = new File(filepath);
 		Scanner inputScanner=null;
 		try {
@@ -76,8 +74,8 @@ public class Context {
 			issue.succeed++;
 		}
 		// set the full event set
-		if (!events.contains(transaction.getEventID())) {
-			events.add(transaction.getEventID());
+		if (!issue.getEvents().contains(transaction.getEventID())) {
+			issue.getEvents().add(transaction.getEventID());
 		}
 		// set the transaction types
 		issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
@@ -86,7 +84,6 @@ public class Context {
 	@Deprecated
 	// set transaction types
 	private void setTransactionModules(List<Transaction>transactions){
-		events = new HashSet<String>();
 		for (Transaction transaction : transactions) {
 			TransactionModule transactionModule = null;
 			if (issue.getTransactionModules().containsKey(transaction.getTransactionID())) {
@@ -103,8 +100,8 @@ public class Context {
 				transactionModule.succeed++;
 			}
 			// set the full event set
-			if (!events.contains(transaction.getEventID())) {
-				events.add(transaction.getEventID());
+			if (!issue.getEvents().contains(transaction.getEventID())) {
+				issue.getEvents().add(transaction.getEventID());
 			}			
 			// set the transaction types
 			issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
@@ -114,11 +111,11 @@ public class Context {
 	
 	// build the context table
 	private  void setContextTable(){
-		CONTEXT_TABLE = new boolean [issue.getTransactionModules().size()][events.size()];
+		CONTEXT_TABLE = new boolean [issue.getTransactionModules().size()][issue.getEvents().size()];
 		// event set is converted to array
-		String [] eventsArray = new String[events.size()]; 
+		String [] eventsArray = new String[issue.getEvents().size()]; 
 		int flag =0;
-		for (String event : events) {
+		for (String event : issue.getEvents()) {
 			eventsArray[flag] = event;
 			flag++;
 		}
@@ -140,7 +137,7 @@ public class Context {
 	}
 	
 	private void printContextTable(){
-		System.out.println(events.toString());
+		System.out.println(issue.getEvents().toString());
 		System.out.println(issue.getTransactionModules().keySet().toString());
 		for (int i = 0; i < CONTEXT_TABLE.length; i++) {
 			for (int j = 0; j < CONTEXT_TABLE[i].length; j++) {
@@ -150,10 +147,46 @@ public class Context {
 			System.out.println();
 		}
 	}	
+	
+	// Here events are attributes of FCA
+	// It takes the attribute set and the context table
+	// returns the closures of given attributes
+	private Set<String> closureOfEvents(Set<String> events, boolean[][] contextTable){
+		Set<String> closure = new HashSet<String>();
+		Set<String> transactionsID = new HashSet<String>();
+		// rotate all the events
+		for (String event : events) {
+			// check whether the event is present in the modules of issue
+			for (String transactionModuleKey : issue.getTransactionModules().keySet()) {
+				// if event present in a module store it in TransactionsID
+				if (issue.getTransactionModules().get(transactionModuleKey).eventSet.contains(event)) {
+					transactionsID.add(transactionModuleKey);
+				}
+			}
+		}
+		int i = 0;
+		for (String transactionKey : transactionsID) {
+			if (i == 0) {
+				// store first module's events as closure
+				closure = issue.getTransactionModules().get(transactionKey).eventSet;
+			} else {
+				// intersection of module's events given transactions with closure 				
+				closure.retainAll(issue.getTransactionModules().get(transactionKey).eventSet);
+			}
+			i++;
+		}
+		return closure;
+	}
+	
+	
+	
 	public static void main(String[] args) {
 		Context context = new Context();
-		context.readAndSetIssueFromFile("src/com/geet/mining/input/input.txt");
+		context.readAndSetIssueFromFile("src/com/geet/mining/input/coursera.txt");
 		System.out.println(context.issue.fail+" "+context.issue.succeed);
+		Set<String> events = new HashSet<String>();
+		events.add("a");
+		System.out.println(context.closureOfEvents(events, context.CONTEXT_TABLE));
 	}
 
 }

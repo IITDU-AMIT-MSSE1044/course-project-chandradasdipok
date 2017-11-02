@@ -2,8 +2,10 @@ package com.geet.mining.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -17,13 +19,13 @@ public class Issue implements Comparable<Issue>{
 	
 	public Issue(){
 		transactions = new ArrayList<Transaction>();
+		events = new HashSet<String>();
 		transactionModules = new HashMap<String,TransactionModule>();
 		signatures = new HashMap<Term,Double>();
 		healingAction = null;
 	}
 	
 	// failed transaction and succeeded transactions given a issue
-	
 	int fail=0,succeed=0;
 	// log messages of an issue
 	private List<Transaction>transactions;
@@ -37,10 +39,13 @@ public class Issue implements Comparable<Issue>{
 	private Map<Term,Double> signatures;
 	
 	// each issue is consists of some modules named 
-	private Map<String,TransactionModule> transactionModules = new HashMap<String,TransactionModule>();	
+	private Map<String,TransactionModule> transactionModules;	
 
 	// latest cosine value with another issue
 	private double cosine=-1;
+	
+	// set of events
+	private Set<String> events;
 	public double getCosine() {
 		return cosine;
 	}
@@ -91,6 +96,14 @@ public class Issue implements Comparable<Issue>{
 
 	public void setTransactionModules(Map<String, TransactionModule> transactionModules) {
 		this.transactionModules = transactionModules;
+	}
+
+	public Set<String> getEvents() {
+		return events;
+	}
+
+	public void setEvents(Set<String> events) {
+		this.events = events;
 	}
 
 	
