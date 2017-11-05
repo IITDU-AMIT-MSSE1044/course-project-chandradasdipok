@@ -11,7 +11,8 @@ package com.geet.mining.model;
  * status (success or failure) @status 
  */
 public class Transaction {
-	private String time, eventID, transactionID, log;
+	private Event event;
+	private String time, transactionID, log;
 	private Status transactionStatus;
 	
 	public String getTime() {
@@ -22,12 +23,12 @@ public class Transaction {
 		this.time = time;
 	}
 
-	public String getEventID() {
-		return eventID;
+	public Event getEvent() {
+		return event;
 	}
 
-	public void setEventID(String eventID) {
-		this.eventID = eventID;
+	public void setEvent(Event event) {
+		this.event = event;
 	}
 
 	public String getTransactionID() {
@@ -57,15 +58,16 @@ public class Transaction {
 	private Transaction(){};
 	
 	public static class TransactionBuilder{
-		private String time, eventID, transactionID, log;
+		private Event event;
+		private String time, transactionID, log;
 		private Status transactionStatus;
 		
 		public TransactionBuilder time(String time){
 			this.time = time;
 			return this;
 		}
-		public TransactionBuilder event(String event){
-			this.eventID = event;
+		public TransactionBuilder event(Event event){
+			this.event = event;
 			return this;
 		}public TransactionBuilder transactionID(String transactionID){
 			this.transactionID = transactionID;
@@ -80,7 +82,7 @@ public class Transaction {
 		public Transaction build(){
 			Transaction transaction = new Transaction();
 			transaction.setTime(time);
-			transaction.setEventID(eventID);
+			transaction.setEvent(event);
 			transaction.setTransactionID(transactionID);;
 			transaction.setLog(log);
 			transaction.setTransactionStatus(transactionStatus);;
@@ -91,7 +93,7 @@ public class Transaction {
 	
 	@Override
 	public String toString() {
-		return time+","+eventID+","+transactionID+","+log+","+transactionStatus;
+		return time+","+event+","+transactionID+","+log+","+transactionStatus;
 	}
 	
 }

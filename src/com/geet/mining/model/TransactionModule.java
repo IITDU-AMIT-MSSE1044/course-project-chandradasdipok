@@ -7,7 +7,7 @@ public class TransactionModule {
 	String transactionID;
 	int fail=0;
 	int succeed=0;
-	Set<String> eventSet = new HashSet<String>(); 
+	Set<Event> eventSet = new HashSet<Event>(); 
 	
 	@Override
 	public String toString() {
@@ -15,7 +15,7 @@ public class TransactionModule {
 		str += transactionID;
 		str += ","+fail;
 		str += ":"+succeed+",{";
-		for (String event : eventSet) {
+		for (Event event : eventSet) {
 			str+=event+" ";
 		}
 		str += "}";

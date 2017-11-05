@@ -19,7 +19,7 @@ public class Issue implements Comparable<Issue>{
 	
 	public Issue(){
 		transactions = new ArrayList<Transaction>();
-		events = new HashSet<String>();
+		events = new HashSet<Event>();
 		transactionModules = new HashMap<String,TransactionModule>();
 		signatures = new HashMap<Term,Double>();
 		healingAction = null;
@@ -45,7 +45,7 @@ public class Issue implements Comparable<Issue>{
 	private double cosine=-1;
 	
 	// set of events
-	private Set<String> events;
+	private Set<Event> events;
 	public double getCosine() {
 		return cosine;
 	}
@@ -98,11 +98,11 @@ public class Issue implements Comparable<Issue>{
 		this.transactionModules = transactionModules;
 	}
 
-	public Set<String> getEvents() {
+	public Set<Event> getEvents() {
 		return events;
 	}
 
-	public void setEvents(Set<String> events) {
+	public void setEvents(Set<Event> events) {
 		this.events = events;
 	}
 

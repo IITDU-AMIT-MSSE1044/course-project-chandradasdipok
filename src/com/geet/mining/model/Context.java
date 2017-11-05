@@ -2,6 +2,7 @@ package com.geet.mining.model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
@@ -42,7 +43,7 @@ public class Context {
 					}else{
 						transactionBuilder.transactionStatus(Status.SUCCESS);						
 					}
-					transactionBuilder.time(tokens[0]).event(tokens[1]).transactionID(tokens[2]).log(tokens[3]);
+					transactionBuilder.time(tokens[0]).event(new Event(tokens[1])).transactionID(tokens[2]).log(tokens[3]);
 					Transaction transaction = transactionBuilder.build();
 					issue.getTransactions().add(transaction);
 					setTransactionModules(transaction);
@@ -65,7 +66,7 @@ public class Context {
 			transactionModule = new TransactionModule();
 			transactionModule.transactionID = (transaction.getTransactionID());
 		}
-		transactionModule.eventSet.add(transaction.getEventID());
+		transactionModule.eventSet.add(transaction.getEvent());
 		if (transaction.getTransactionStatus() == Status.FAILURE) {
 			transactionModule.fail++;
 			issue.fail++;
@@ -74,48 +75,22 @@ public class Context {
 			issue.succeed++;
 		}
 		// set the full event set
-		if (!issue.getEvents().contains(transaction.getEventID())) {
-			issue.getEvents().add(transaction.getEventID());
+		if (!issue.getEvents().contains(transaction.getEvent())) {
+			issue.getEvents().add(transaction.getEvent());
 		}
 		// set the transaction types
 		issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
 	}
 	
-	@Deprecated
-	// set transaction types
-	private void setTransactionModules(List<Transaction>transactions){
-		for (Transaction transaction : transactions) {
-			TransactionModule transactionModule = null;
-			if (issue.getTransactionModules().containsKey(transaction.getTransactionID())) {
-				transactionModule = issue.getTransactionModules().get(transaction.getTransactionID());
-			}else{
-				transactionModule = new TransactionModule();
-				transactionModule.transactionID=(transaction.getTransactionID());
-				
-			}
-			transactionModule.eventSet.add(transaction.getEventID());
-			if (transaction.getTransactionStatus()==Status.FAILURE) {
-				transactionModule.fail++;
-			}else{
-				transactionModule.succeed++;
-			}
-			// set the full event set
-			if (!issue.getEvents().contains(transaction.getEventID())) {
-				issue.getEvents().add(transaction.getEventID());
-			}			
-			// set the transaction types
-			issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
-			
-		}
-	}
+	
 	
 	// build the context table
 	private  void setContextTable(){
 		CONTEXT_TABLE = new boolean [issue.getTransactionModules().size()][issue.getEvents().size()];
 		// event set is converted to array
-		String [] eventsArray = new String[issue.getEvents().size()]; 
+		Event [] eventsArray = new Event[issue.getEvents().size()]; 
 		int flag =0;
-		for (String event : issue.getEvents()) {
+		for (Event event : issue.getEvents()) {
 			eventsArray[flag] = event;
 			flag++;
 		}
@@ -127,6 +102,8 @@ public class Context {
 			flag++;
 		}
 		flag = 0;
+		System.out.println(transactionTypeArray.toString());
+		System.out.println(eventsArray.toString());
 		for (int i = 0; i < transactionTypeArray.length; i++) {
 			for (int j = 0; j < eventsArray.length; j++) {
 				if (issue.getTransactionModules().get(transactionTypeArray[i]).eventSet.contains(eventsArray[j])) {
@@ -151,8 +128,8 @@ public class Context {
 	// Here events are attributes of FCA
 	// It takes the attribute set and the context table
 	// returns the closures of given attributes
-	private Set<String> closureOfEvents(Set<String> events, boolean[][] contextTable){
-		Set<String> closure = new HashSet<String>();
+	private Set<Event> closureOfEvents(Set<Event> events, boolean[][] contextTable){
+		Set<Event> closure = new HashSet<Event>();
 		Set<String> transactionsID = new HashSet<String>();
 		
 		// collects the transactions which has common attributes i.e., events
@@ -180,6 +157,7 @@ public class Context {
 		}
 		return closure;
 	}
+	
 	// next closure algorithms
 	private Set<Event> getNextClosedSet(Set<Event> closedSet, List<Event> attributes){
 		Set<Event> nextClosedSet = new HashSet<Event>();
@@ -190,23 +168,47 @@ public class Context {
 			} else {
 				closedSet.add(m);
 				nextClosedSet = closureOfEvents(closedSet, CONTEXT_TABLE);
-				// detect whether there is difference between closed set and next closed set less than m
+				// detect whether there is difference between closed set and 
+				// next closed set less than m
 				Set<Event> diff = nextClosedSet;
 				diff.removeAll(closedSet);
-				
+				boolean hasElementLessThanM = true;
+				for (Event event : diff) {
+					if (m.compareTo(event)==0) {
+						hasElementLessThanM = true;
+					}
+				}
+				if (hasElementLessThanM) {
+					
+				} else {
+
+				}
 			}
 		}
-		return nextClosedSet;
+		return new HashSet<Event>();
+	}
+	
+	private Set<Event> getFirstClosure(){
+		return new HashSet<Event>();
+	}
+	
+	private void getAllClosures(List<Event> attributes){
+		Set<Event> closedSet = getFirstClosure();
+		int i=0;
+		while (i<50) {
+			System.out.println(closedSet);
+			closedSet = getNextClosedSet(closedSet, attributes);
+			i++;
+		}
+		return ;
 	}
 	
 	public static void main(String[] args) {
 		Context context = new Context();
 		context.readAndSetIssueFromFile("src/com/geet/mining/input/coursera.txt");
 		System.out.println(context.issue.fail+" "+context.issue.succeed);
-		Set<String> events = new HashSet<String>();
-		events.add("d");
-		events.add("e");
-		System.out.println(context.closureOfEvents(events, context.CONTEXT_TABLE));
+		context.getAllClosures(new ArrayList<Event>(context.issue.getEvents()));
+		
 	}
 
 }

@@ -1,5 +1,6 @@
 package com.geet.mining.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -44,5 +45,17 @@ public class Term {
 
 	public void setDMIAsWeight(double dMIAsWeight) {
 		DMIAsWeight = dMIAsWeight;
+	}
+	
+	public static void main(String[] args) {
+		Set<String> events1 = new HashSet<String>();
+		events1.add("a");
+		events1.add("c");
+		Set<String> events2 = new HashSet<String>();
+		events2.add("b");
+		events2.add("a");
+		Term t1 = new Term(events1, 0.0);
+		Term t2 = new Term(events2, 1.0);
+		System.out.println(t1.equals(t2));
 	}
 }
