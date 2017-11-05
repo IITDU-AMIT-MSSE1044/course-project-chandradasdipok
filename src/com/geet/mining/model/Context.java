@@ -180,8 +180,24 @@ public class Context {
 		}
 		return closure;
 	}
-	
-	
+	// next closure algorithms
+	private Set<Event> getNextClosedSet(Set<Event> closedSet, List<Event> attributes){
+		Set<Event> nextClosedSet = new HashSet<Event>();
+		for (int i = attributes.size()-1; i >=0; i--) {
+			Event m = attributes.get(i);
+			if (closedSet.contains(m)) {
+				closedSet.remove(m);
+			} else {
+				closedSet.add(m);
+				nextClosedSet = closureOfEvents(closedSet, CONTEXT_TABLE);
+				// detect whether there is difference between closed set and next closed set less than m
+				Set<Event> diff = nextClosedSet;
+				diff.removeAll(closedSet);
+				
+			}
+		}
+		return nextClosedSet;
+	}
 	
 	public static void main(String[] args) {
 		Context context = new Context();
