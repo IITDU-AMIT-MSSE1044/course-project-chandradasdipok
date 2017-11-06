@@ -136,7 +136,7 @@ public class Context {
 		for (String moduleKey : issue.getTransactionModules().keySet()) {
 			if (issue.getTransactionModules().get(moduleKey).eventSet.containsAll(events)) {
 				transactionsID.add(moduleKey);
-				System.out.println("Module Key"+moduleKey);
+			//	System.out.println("Module Key"+moduleKey);
 			}
 		}
 		
@@ -164,19 +164,19 @@ public class Context {
 		for (int i = attributes.size()-1; i >=0; i--) {
 			Set<Event> nextClosedSet = new HashSet<Event>();
 			Event m = attributes.get(i);
-			System.out.println("Element "+m);
+			// System.out.println("Element "+m);
 			if (closedSet.contains(m)) {
 				closedSet.remove(m);
-				System.out.println("Closed Set after remove "+closedSet);
+			//	System.out.println("Closed Set after remove "+closedSet);
 			} else {
 				nextClosedSet.addAll(closedSet);
 				nextClosedSet.add(m);
-				System.out.println("Next Closed Set "+nextClosedSet);
-				System.out.println("Total Events "+issue.getEvents());
-				System.out.println("Closures: "+closureOfEvents(nextClosedSet, CONTEXT_TABLE));
+			//	System.out.println("Next Closed Set "+nextClosedSet);
+			//	System.out.println("Total Events "+issue.getEvents());
+			//	System.out.println("Closures: "+closureOfEvents(nextClosedSet, CONTEXT_TABLE));
 				nextClosedSet = closureOfEvents(nextClosedSet, CONTEXT_TABLE);
-				System.out.println("Closures of Next Closed Set "+nextClosedSet);
-				if (!hasLessThanElementM(nextClosedSet, closedSet, m)) {
+			//	System.out.println("Closures of Next Closed Set "+nextClosedSet);
+				if (!hasLessThanElementM(Event.getClonedEvents(nextClosedSet), closedSet, m)) {
 					return nextClosedSet;
 				}
 			}
@@ -187,17 +187,18 @@ public class Context {
 	// detect whether there is difference between closed set and 
 	// next closed set less than m
 	private boolean hasLessThanElementM(Set<Event> nextClosedSet, Set<Event>closedSet, Event eventM){
-		System.out.println("Element Check "+eventM);
-		System.out.println(nextClosedSet);
-		System.out.println(closedSet);
+	//	System.out.println("Element Check "+eventM);
+	//	System.out.println(nextClosedSet);
+	//	System.out.println(closedSet);
 		Set<Event> diff = nextClosedSet;
 		diff.removeAll(closedSet);
-		System.out.println(diff);
+	//	System.out.println(diff);
 		// if has elements less than eventM
 		// return true
+		// else return false
 		for (Event event : diff) {
 			if (eventM.getEventString().compareTo(event.getEventString())> 0) {
-				System.out.println("Smallest New Element "+ event);
+			//	System.out.println("Smallest New Element "+ event);
 				return true;
 			}
 		}
@@ -213,6 +214,9 @@ public class Context {
 		int i=0;
 		while (i<50) {
 			System.out.println("No. "+i+": Closed Sets "+closedSet);
+			if (closedSet.equals(issue.getEvents())) {
+				break;
+			}
 			closedSet = Event.getClonedEvents(getNextClosedSet(Event.getClonedEvents(closedSet), attributes));
 			i++;
 		}
