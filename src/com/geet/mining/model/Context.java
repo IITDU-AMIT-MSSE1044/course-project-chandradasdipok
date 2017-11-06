@@ -136,22 +136,23 @@ public class Context {
 		for (String moduleKey : issue.getTransactionModules().keySet()) {
 			if (issue.getTransactionModules().get(moduleKey).eventSet.containsAll(events)) {
 				transactionsID.add(moduleKey);
+				System.out.println("Module Key"+moduleKey);
 			}
 		}
 		
 		// if the object set of common attributes i.e., events is empty then return all the attributes 
 		if (transactionsID.size() == 0) {
-			return issue.getEvents();
+			return Event.getClonedEvents(issue.getEvents());
 		} 
 		//other wise take the intersection of all the events of objects
 		else {
 			for (String transactionKey : transactionsID) {
 				if (closure.size() == 0) {
 					// store first module's events as closure
-					closure = issue.getTransactionModules().get(transactionKey).eventSet;
+					closure = Event.getClonedEvents(issue.getTransactionModules().get(transactionKey).eventSet);
 				} else {
 					// intersection of module's events given transactions with closure 				
-					closure.retainAll(issue.getTransactionModules().get(transactionKey).eventSet);
+					closure.retainAll(Event.getClonedEvents(issue.getTransactionModules().get(transactionKey).eventSet));
 				}
 			}
 		}
@@ -160,32 +161,47 @@ public class Context {
 	
 	// next closure algorithms
 	private Set<Event> getNextClosedSet(Set<Event> closedSet, List<Event> attributes){
-		Set<Event> nextClosedSet = new HashSet<Event>();
 		for (int i = attributes.size()-1; i >=0; i--) {
+			Set<Event> nextClosedSet = new HashSet<Event>();
 			Event m = attributes.get(i);
+			System.out.println("Element "+m);
 			if (closedSet.contains(m)) {
 				closedSet.remove(m);
+				System.out.println("Closed Set after remove "+closedSet);
 			} else {
-				closedSet.add(m);
-				nextClosedSet = closureOfEvents(closedSet, CONTEXT_TABLE);
-				// detect whether there is difference between closed set and 
-				// next closed set less than m
-				Set<Event> diff = nextClosedSet;
-				diff.removeAll(closedSet);
-				boolean hasElementLessThanM = true;
-				for (Event event : diff) {
-					if (m.compareTo(event)==0) {
-						hasElementLessThanM = true;
-					}
-				}
-				if (hasElementLessThanM) {
-					
-				} else {
-
+				nextClosedSet.addAll(closedSet);
+				nextClosedSet.add(m);
+				System.out.println("Next Closed Set "+nextClosedSet);
+				System.out.println("Total Events "+issue.getEvents());
+				System.out.println("Closures: "+closureOfEvents(nextClosedSet, CONTEXT_TABLE));
+				nextClosedSet = closureOfEvents(nextClosedSet, CONTEXT_TABLE);
+				System.out.println("Closures of Next Closed Set "+nextClosedSet);
+				if (!hasLessThanElementM(nextClosedSet, closedSet, m)) {
+					return nextClosedSet;
 				}
 			}
 		}
 		return new HashSet<Event>();
+	}
+	
+	// detect whether there is difference between closed set and 
+	// next closed set less than m
+	private boolean hasLessThanElementM(Set<Event> nextClosedSet, Set<Event>closedSet, Event eventM){
+		System.out.println("Element Check "+eventM);
+		System.out.println(nextClosedSet);
+		System.out.println(closedSet);
+		Set<Event> diff = nextClosedSet;
+		diff.removeAll(closedSet);
+		System.out.println(diff);
+		// if has elements less than eventM
+		// return true
+		for (Event event : diff) {
+			if (eventM.getEventString().compareTo(event.getEventString())> 0) {
+				System.out.println("Smallest New Element "+ event);
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	private Set<Event> getFirstClosure(){
@@ -196,8 +212,8 @@ public class Context {
 		Set<Event> closedSet = getFirstClosure();
 		int i=0;
 		while (i<50) {
-			System.out.println(closedSet);
-			closedSet = getNextClosedSet(closedSet, attributes);
+			System.out.println("No. "+i+": Closed Sets "+closedSet);
+			closedSet = Event.getClonedEvents(getNextClosedSet(Event.getClonedEvents(closedSet), attributes));
 			i++;
 		}
 		return ;
@@ -207,8 +223,13 @@ public class Context {
 		Context context = new Context();
 		context.readAndSetIssueFromFile("src/com/geet/mining/input/coursera.txt");
 		System.out.println(context.issue.fail+" "+context.issue.succeed);
-		context.getAllClosures(new ArrayList<Event>(context.issue.getEvents()));
-		
+		context.getAllClosures(new ArrayList<Event>(Event.getClonedEvents(context.issue.getEvents())));
+		//System.out.println(context.getNextClosedSet(new HashSet<Event>(), new ArrayList<>(context.issue.getEvents())));;
+		/*System.out.println();
+		Set<Event> events = new HashSet<Event>();
+		events.add(new Event("c"));
+		events.add(new Event("e"));
+		System.out.println(context.closureOfEvents(events,context.CONTEXT_TABLE));*/
 	}
 
 }

@@ -3,15 +3,17 @@ package com.geet.mining.model;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Event implements Comparable<Event>{
+public class Event implements Comparable<Event>,Cloneable{
 
+	public static long ID=0;
 	private String eventString;
 	private long value;
 	
 
 	public Event(String eventString) {
+		ID++;
 		setEventString(eventString);
-		setValue(0);
+		setValue(ID);
 	}
 	
 	public String getEventString() {
@@ -63,6 +65,8 @@ public class Event implements Comparable<Event>{
 		System.out.println(events.add(e4));
 		System.out.println(events.toString());
 		
+		System.out.println("a".compareTo("b"));
+		
 		
 	}
 
@@ -74,4 +78,17 @@ public class Event implements Comparable<Event>{
 			return 0;
 		}
 	}
+	
+	public Event clone(){
+		return new Event(eventString);
+	}
+	
+	public static Set<Event> getClonedEvents(Set<Event> events){
+		Set<Event> clonedEvents = new HashSet<Event>();
+		for (Event event : events) {
+			clonedEvents.add(event.clone());
+		}
+		return clonedEvents;
+	}
+	
 }
