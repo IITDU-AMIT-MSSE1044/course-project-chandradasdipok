@@ -214,6 +214,7 @@ public class Context {
 		int i=0;
 		while (i<50) {
 			System.out.println("No. "+i+": Closed Sets "+closedSet);
+			generateNodeFromAClosedSet(Event.getClonedEvents(closedSet));
 			if (closedSet.equals(issue.getEvents())) {
 				break;
 			}
@@ -222,6 +223,22 @@ public class Context {
 		}
 		return ;
 	}
+	
+	// generate a node of FCA graph from a closed set
+	private void generateNodeFromAClosedSet(Set<Event>closedSet){
+		Node node = new Node();
+		node.setClosedSet(closedSet);
+		for (String moduleKey : issue.getTransactionModules().keySet()) {
+			TransactionModule transactionModule = issue.getTransactionModules().get(moduleKey);
+	//		System.out.println(transactionModule.toString());
+			if (transactionModule.eventSet.containsAll(closedSet)) {
+				node.setSucceed(node.getSucceed()+transactionModule.succeed);
+				node.setFail(node.getFail()+transactionModule.fail);
+			}
+		}
+		System.out.println(node);
+	}
+	
 	
 	public static void main(String[] args) {
 		Context context = new Context();
