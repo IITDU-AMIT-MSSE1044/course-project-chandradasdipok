@@ -106,5 +106,34 @@ public class Issue implements Comparable<Issue>{
 		this.events = events;
 	}
 
+	// indicates the probability of fail of randomly selected transaction
+	// given the issue
+	private double getProbablityOfFail() {
+		return (double) getFail() / ((double) getFail() + getSucceed());
+	}
+
+	// indicates the probability of succeed of randomly selected transaction
+	// given the issue
+	private double getProbablityOfSuccess() {
+		return (double) getSucceed() / ((double) getFail() + getSucceed());
+	}
+
+	
+	
+	public int getFail() {
+		return fail;
+	}
+
+	public void setFail(int fail) {
+		this.fail = fail;
+	}
+
+	public int getSucceed() {
+		return succeed;
+	}
+
+	public void setSucceed(int succeed) {
+		this.succeed = succeed;
+	}
 	
 }
