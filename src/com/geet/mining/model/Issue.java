@@ -22,8 +22,12 @@ public class Issue implements Comparable<Issue>{
 		events = new HashSet<Event>();
 		transactionModules = new HashMap<String,TransactionModule>();
 		signatures = new HashMap<Term,Double>();
+		nodes = new HashSet<Node>();
 		healingAction = null;
 	}
+	
+	// nodes of FCA graph representation of an issue
+	private Set<Node> nodes;
 	
 	// failed transaction and succeeded transactions given a issue
 	int fail=0,succeed=0;
@@ -118,8 +122,6 @@ public class Issue implements Comparable<Issue>{
 		return (double) getSucceed() / ((double) getFail() + getSucceed());
 	}
 
-	
-	
 	public int getFail() {
 		return fail;
 	}
@@ -135,5 +137,70 @@ public class Issue implements Comparable<Issue>{
 	public void setSucceed(int succeed) {
 		this.succeed = succeed;
 	}
-	
+
+	public Set<Node> getNodes() {
+		return nodes;
+	}
+
+	public void setNodes(Set<Node> nodes) {
+		this.nodes = nodes;
+	}
+	// generate the signatures for the given issue
+	public void generateSignatures(){
+		// traverse all the nodes
+		// store the traversed nodes in previousNodes
+		for (Node currentNode : Node.clonedNodes(getNodes())) {
+			// retrieve the nodes those are super concept of the current Node  
+			// A node is super of current Node if  the node is sub set of current Node
+			// store all the super nodes as candidate nodes from the previous nodes
+			System.out.println("Current Node :"+currentNode);
+			Set<Node>parentNodes = new HashSet<Node>();
+			for (Node storedNode : Node.clonedNodes(getNodes())) {
+				if (currentNode.isChildtOf(storedNode)) {
+					// add stored node to parent nodes
+//					System.out.println(currentNode+" is child of "+storedNode);
+//					// check whether stored node is present as subset in parent nodes  
+					boolean isStoredNodePresentAsParent = false;
+					// delete the nodes from parent nodes which are parent of stored node 
+					Set<Node> toDeletenodes = new HashSet<Node>();
+					for (Node node : parentNodes) {
+						if (storedNode.isChildtOf(node)) {
+							toDeletenodes.add(node);
+						}
+						if (node.isChildtOf(storedNode)) {
+							isStoredNodePresentAsParent = true;
+						}		
+					}
+					for (Node node : toDeletenodes) {
+						parentNodes.remove(node);
+//						System.out.println("Removed "+node);
+					}
+					if(!isStoredNodePresentAsParent) {	
+//						System.out.println("added "+storedNode);
+						parentNodes.add(storedNode.toClone());
+					}else{
+//						System.out.println("ignored "+storedNode);
+					}
+				}
+			}
+			System.out.println("Parents :"+parentNodes);
+			
+			// calculate the mutual information between current nodes and parent node
+			// and store if full fill certain criteria
+			
+			for (Node node : parentNodes) {
+				// DMI - Delta Mutual Information
+				double DMI = currentNode.getMutualInformationGivenComponentOfIssue(this)-node.getMutualInformationGivenComponentOfIssue(this);
+				if (DMI>0) {
+					Set<String> events = new HashSet<String>();
+					currentNode.getClosedSet().retainAll(node.getClosedSet());
+					for (Event event : currentNode.getClosedSet()) {
+						events.add(event.getEventString());
+					}
+					Term term = new Term(events, DMI);
+					signatures.put(term, term.getDMIAsWeight());
+				}
+			}
+		}
+	}
 }

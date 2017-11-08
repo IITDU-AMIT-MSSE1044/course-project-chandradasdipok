@@ -59,11 +59,33 @@ public class Node {
 		return (double) succeed /((double) fail+succeed);
 	}
 	// calculates the mutual information between the node i.e., concept and the issue where the node resides 
-	private double getMutualInformationGivenComponentOfIssue(Issue issue){
+	public double getMutualInformationGivenComponentOfIssue(Issue issue){
 		// MI means Mutual Information
 		double MI= 0.0;
 		
 		return MI;
 	}
+	// clone of Node
+	public Node toClone(){
+		Node clone = new Node();
+		clone.setClosedSet(Event.getClonedEvents(closedSet));
+		clone.setFail(fail);
+		clone.setSucceed(succeed);
+		return clone;
+	}
+	// check whether this node is child of the Node node
+	public boolean isChildtOf(Node node){
+		if (!getClosedSet().equals(node.getClosedSet()) && getClosedSet().containsAll(node.getClosedSet()) ) {
+			return true;
+		} 
+		return false;
+	}
 	
+	public static Set<Node> clonedNodes(Set<Node> nodes){
+		Set<Node> clonedNodes = new HashSet<Node>();
+		for (Node node : nodes) {
+			clonedNodes.add(node.toClone());
+		}
+		return clonedNodes;
+	}
 }

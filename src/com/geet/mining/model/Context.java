@@ -214,7 +214,7 @@ public class Context {
 		int i=0;
 		while (i<50) {
 			System.out.println("No. "+i+": Closed Sets "+closedSet);
-			generateNodeFromAClosedSet(Event.getClonedEvents(closedSet));
+			issue.getNodes().add(generateNodeFromAClosedSet(Event.getClonedEvents(closedSet)));
 			if (closedSet.equals(issue.getEvents())) {
 				break;
 			}
@@ -225,18 +225,19 @@ public class Context {
 	}
 	
 	// generate a node of FCA graph from a closed set
-	private void generateNodeFromAClosedSet(Set<Event>closedSet){
-		Node node = new Node();
-		node.setClosedSet(closedSet);
+	private Node generateNodeFromAClosedSet(Set<Event>closedSet){
+		Node generatedNode = new Node();
+		generatedNode.setClosedSet(closedSet);
 		for (String moduleKey : issue.getTransactionModules().keySet()) {
 			TransactionModule transactionModule = issue.getTransactionModules().get(moduleKey);
 	//		System.out.println(transactionModule.toString());
 			if (transactionModule.eventSet.containsAll(closedSet)) {
-				node.setSucceed(node.getSucceed()+transactionModule.succeed);
-				node.setFail(node.getFail()+transactionModule.fail);
+				generatedNode.setSucceed(generatedNode.getSucceed()+transactionModule.succeed);
+				generatedNode.setFail(generatedNode.getFail()+transactionModule.fail);
 			}
 		}
-		System.out.println(node);
+		System.out.println(generatedNode);
+		return generatedNode;
 	}
 	
 	
@@ -245,6 +246,7 @@ public class Context {
 		context.readAndSetIssueFromFile("src/com/geet/mining/input/coursera.txt");
 		System.out.println(context.issue.fail+" "+context.issue.succeed);
 		context.getAllClosures(new ArrayList<Event>(Event.getClonedEvents(context.issue.getEvents())));
+		context.issue.generateSignatures();
 		//System.out.println(context.getNextClosedSet(new HashSet<Event>(), new ArrayList<>(context.issue.getEvents())));;
 		/*System.out.println();
 		Set<Event> events = new HashSet<Event>();
