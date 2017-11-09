@@ -22,6 +22,16 @@ public class Term {
 		eventsAsValue = events;
 		DMIAsWeight = weight;
 	}
+	
+	@Override
+	public int hashCode() {
+		String hash="";
+		for (String str : eventsAsValue) {
+			hash+=str;
+		}
+		return hash.hashCode();
+	}
+	
 	// return true if the event set is same
 	@Override
 	public boolean equals(Object obj) {
@@ -47,6 +57,15 @@ public class Term {
 		DMIAsWeight = dMIAsWeight;
 	}
 	
+	@Override
+	public String toString() {
+		String toString = "";
+		for (String event : getEventsAsValue()) {
+			toString+=event+",";
+		}
+		toString+=DMIAsWeight;
+		return toString;
+	}
 	public static void main(String[] args) {
 		Set<String> events1 = new HashSet<String>();
 		events1.add("a");
@@ -57,5 +76,9 @@ public class Term {
 		Term t1 = new Term(events1, 0.0);
 		Term t2 = new Term(events2, 1.0);
 		System.out.println(t1.equals(t2));
+	}
+	
+	public Term toClone() {
+		return new Term(getEventsAsValue(), DMIAsWeight);
 	}
 }
