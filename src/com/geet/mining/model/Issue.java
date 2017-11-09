@@ -112,13 +112,13 @@ public class Issue implements Comparable<Issue>{
 
 	// indicates the probability of fail of randomly selected transaction
 	// given the issue
-	private double getProbablityOfFail() {
+	public double getProbablityOfFailOfRandomlySelectedTransaction() {
 		return (double) getFail() / ((double) getFail() + getSucceed());
 	}
 
 	// indicates the probability of succeed of randomly selected transaction
 	// given the issue
-	private double getProbablityOfSuccess() {
+	public double getProbablityOfSuccessOfRandomlySelectedTransaction() {
 		return (double) getSucceed() / ((double) getFail() + getSucceed());
 	}
 
@@ -187,20 +187,26 @@ public class Issue implements Comparable<Issue>{
 			
 			// calculate the mutual information between current nodes and parent node
 			// and store if full fill certain criteria
-			
-			for (Node node : parentNodes) {
-				// DMI - Delta Mutual Information
-				double DMI = currentNode.getMutualInformationGivenComponentOfIssue(this)-node.getMutualInformationGivenComponentOfIssue(this);
-				if (DMI>0) {
-					Set<String> events = new HashSet<String>();
-					currentNode.getClosedSet().retainAll(node.getClosedSet());
-					for (Event event : currentNode.getClosedSet()) {
-						events.add(event.getEventString());
+			// if the mutual information of current node is greater than zero 
+			// and the difference between current node and child node is non zero
+			double MICurrentNode = currentNode.getMutualInformationGivenIssue(this);
+			if (MICurrentNode > 0) {
+				for (Node node : parentNodes) {
+					// DMI - Delta Mutual Information
+					double MIParentNode = node.getMutualInformationGivenIssue(this);
+					double DMI = MICurrentNode - MIParentNode;
+					if (DMI > 0 ) {
+						Set<String> events = new HashSet<String>();
+						Set<Event> suspectEvents = Event.getClonedEvents(currentNode.getClosedSet());
+						suspectEvents.retainAll(Event.getClonedEvents(node.getClosedSet()));
+						for (Event event : suspectEvents) {
+							events.add(event.getEventString());
+						}
+						Term term = new Term(events, DMI);
+						signatures.put(term, term.getDMIAsWeight());
 					}
-					Term term = new Term(events, DMI);
-					signatures.put(term, term.getDMIAsWeight());
 				}
-			}
+			} 
 		}
 	}
 }
