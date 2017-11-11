@@ -7,14 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.geet.mining.concept_contrast_analysis.ConceptAnalyzer;
+
 /**
  * 
- * @author chandradasdipok This class is a model to store the information of
- *         logs, healing action and the signature of issue Issue represents the
- *         document vector in similar issue retrieval
+ * @author chandradasdipok 
+ * This class is a model to store the information of
+ * logs, healing action and the signature of issue Issue represents the
+ * document vector in similar issue retrieval
  */
 public class Issue implements Comparable<Issue> {
 
+	boolean isSigAvail = false;
+	
 	public Issue() {
 		transactions = new ArrayList<Transaction>();
 		events = new HashSet<Event>();
@@ -26,13 +31,12 @@ public class Issue implements Comparable<Issue> {
 
 	// nodes of FCA graph representation of an issue
 	private Set<Node> nodes;
-
 	// failed transaction and succeeded transactions given a issue
-	int fail = 0, succeed = 0;
+	private int fail = 0, succeed = 0;
 	// log messages of an issue
 	private List<Transaction> transactions;
 	// healing action of an issue
-	private String healingAction;
+	private HealingAction healingAction;
 	// the signatures of an issue
 	// the collection of terms
 	// where term is also collection of events with weight in DMI
@@ -102,22 +106,38 @@ public class Issue implements Comparable<Issue> {
 		this.succeed = succeed;
 	}
 
-	public Set<Node> getNodes() {
+	private Set<Node> getNodes() {
 		return nodes;
 	}
 
-	public void setNodes(Set<Node> nodes) {
+	private void setNodes(Set<Node> nodes) {
 		this.nodes = nodes;
+	}
+
+
+	public HealingAction getHealingAction() {
+		return healingAction;
+	}
+
+	public void setHealingAction(HealingAction healingAction) {
+		this.healingAction = healingAction;
 	}
 
 	// generate the signatures for the given issue
 	public void generateSignatures() {
+		
+		
+		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
+		
+		// generate  the nodes of a FCA graph
+		setNodes(conceptAnalyzer.generateNodesOfGraph());
+		
+		
 		// traverse all the nodes
 		// store the traversed nodes in previousNodes
 		for (Node currentNode : Node.clonedNodes(getNodes())) {
 			// retrieve the nodes those are super concept of the current Node
-			// A node is super of current Node if the node is sub set of current
-			// Node
+			// A node is super of current Node if the node is sub set of current Node
 			// store all the super nodes as candidate nodes from the previous
 			// nodes
 			System.out.println("Current Node :" + currentNode);
@@ -154,12 +174,11 @@ public class Issue implements Comparable<Issue> {
 			}
 			System.out.println("Parents :" + parentNodes);
 
-			// calculate the mutual information between current nodes and parent
-			// node
+			
+			// calculate the mutual information between current nodes and parent node
 			// and store if full fill certain criteria
 			// if the mutual information of current node is greater than zero
-			// and the difference between current node and child node is non
-			// zero
+			// and the difference between current node and child node is non zero
 			double MICurrentNode = currentNode
 					.getMutualInformationGivenIssue(this);
 			if (MICurrentNode > 0) {
@@ -184,7 +203,7 @@ public class Issue implements Comparable<Issue> {
 			}
 		}
 	}
-
+	
 	//---------- Similar Issue Retrieval------------//
 	
 	// represent an issue as a document and a collection of terms

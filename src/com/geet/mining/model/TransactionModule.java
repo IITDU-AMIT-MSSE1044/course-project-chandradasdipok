@@ -4,10 +4,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class TransactionModule {
-	String transactionID;
-	int fail=0;
-	int succeed=0;
-	Set<Event> eventSet = new HashSet<Event>(); 
+	public String transactionID;
+	public int fail=0;
+	public int succeed=0;
+	public Set<Event> eventSet = new HashSet<Event>(); 
 	
 	@Override
 	public String toString() {

@@ -1,0 +1,6 @@
+For each issue, the inputs are maintained in directory
+Each directory contains two text file
+One file contains the transaction logs 
+file format :"<issue_no>_logs.txt"
+Another file contains the healing action
+file format :"<issue_no>_heal.txt>"
