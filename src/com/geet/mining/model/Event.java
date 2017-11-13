@@ -5,15 +5,12 @@ import java.util.Set;
 
 public class Event implements Comparable<Event>,Cloneable{
 
-	public static long ID=0;
 	private String eventString;
-	private long value;
+	private int value;
 	
 
 	public Event(String eventString) {
-		ID++;
 		setEventString(eventString);
-		setValue(ID);
 	}
 	
 	public String getEventString() {
@@ -24,11 +21,11 @@ public class Event implements Comparable<Event>,Cloneable{
 		this.eventString = eventString;
 	}
 
-	public long getValue() {
+	public int getValue() {
 		return value;
 	}
 
-	public void setValue(long value) {
+	public void setValue(int value) {
 		this.value = value;
 	}
 
@@ -72,15 +69,13 @@ public class Event implements Comparable<Event>,Cloneable{
 
 	@Override
 	public int compareTo(Event o) {
-		if (value >= o.value) {
-			return 1;
-		} else {
-			return 0;
-		}
+		return (o.value-value);
 	}
 	
 	public Event clone(){
-		return new Event(eventString);
+		Event event = new Event(eventString);
+		event.setValue(value);
+		return event;
 	}
 	
 	public static Set<Event> getClonedEvents(Set<Event> events){

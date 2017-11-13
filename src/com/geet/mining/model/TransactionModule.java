@@ -21,4 +21,13 @@ public class TransactionModule {
 		str += "}";
 		return str;
 	}
+	
+	public TransactionModule toClone(){
+		TransactionModule transactionModule = new TransactionModule();
+		transactionModule.transactionID = transactionID;
+		transactionModule.fail = fail;
+		transactionModule.succeed = succeed;
+		transactionModule.eventSet = Event.getClonedEvents(eventSet);
+		return transactionModule;
+	}
 }

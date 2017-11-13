@@ -23,6 +23,14 @@ public class ConceptAnalyzer {
 
 	public ConceptAnalyzer(Issue issue) {
 		this.issue = issue;
+		int i=0;
+		for (Event event : issue.getEvents()) {
+			event.setValue(i);
+			i++;
+		}
+		for (Event event : issue.getEvents()) {
+			System.out.println(event.getEventString()+","+event.getValue());
+		}
 	}
 
 	// Generate all the nodes of fca graph of an issue
@@ -31,6 +39,10 @@ public class ConceptAnalyzer {
 	public Set<Node> generateNodesOfGraph() {
 		Set<Node> nodes = new HashSet<Node>();
 		List<Event> attributes = new ArrayList<>(Event.getClonedEvents(issue.getEvents()));
+		System.out.println("Eventsssssssss");
+		for (Event event : attributes) {
+			System.out.println(event+","+event.getValue());
+		}
 		Set<Event> closedSet = getFirstClosure();
 		int i = 0;
 		while (i < 50) {
@@ -131,7 +143,9 @@ public class ConceptAnalyzer {
 		// return true
 		// else return false
 		for (Event event : diff) {
-			if (eventM.getEventString().compareTo(event.getEventString()) > 0) {
+			//if (eventM.getEventString().compareTo(event.getEventString()) > 0) {
+			System.out.println(eventM.getValue()+","+event.getValue());
+			if(eventM.getValue() > event.getValue()){
 				// System.out.println("Smallest New Element "+ event);
 				return true;
 			}

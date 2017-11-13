@@ -257,4 +257,17 @@ public class Issue implements Comparable<Issue> {
 		return (cosine > issue.cosine) ? 1 : 0;
 	}
 
+	public Issue(List<TransactionModule> modules){
+		transactions = new ArrayList<Transaction>();
+		events = new HashSet<Event>();
+		transactionModules = new HashMap<String, TransactionModule>();
+		signatures = new HashMap<Term, Double>();
+		nodes = new HashSet<Node>();
+		healingAction = null;
+		for (TransactionModule module : modules) {
+			transactionModules.put(module.transactionID, module);
+			events.addAll(Event.getClonedEvents(module.eventSet));
+		}
+	}
+	
 }

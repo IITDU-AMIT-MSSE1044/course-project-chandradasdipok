@@ -23,9 +23,23 @@ import com.geet.mining.model.Transaction.TransactionBuilder;
  */
 public class InputHandler {
 
-	private Issue issue;
+	public Issue issue;
 	private boolean [][] CONTEXT_TABLE;
 
+	
+	public boolean readIssueFromTransactionModules(List<TransactionModule>modules){
+		issue = new Issue();
+		for (TransactionModule module : modules) {
+			issue.getEvents().addAll(Event.getClonedEvents(module.eventSet));
+			issue.setFail(issue.getFail()+module.fail);
+			issue.setSucceed(issue.getSucceed()+module.succeed);
+			issue.getTransactionModules().put(module.transactionID, module);
+		}
+		setContextTable();
+		printContextTable();
+		System.out.println(issue.getEvents());
+		return false;
+	}
 	
 	// read each issue from an directory
 	public boolean readIssueFromDirectory(String dirPath){
