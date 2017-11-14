@@ -73,6 +73,8 @@ public class Node {
 	// y #succeeded transaction instance of this node
 	public double getMutualInformationGivenIssue(Issue issue){
 		// MI means Mutual Information
+		System.out.println("MI ");
+		System.out.println(this);
 		double MI= 0.0;
 		double n=issue.getFail(),m=issue.getSucceed(),x=getFail(),y=getSucceed();
 		double pX1 = getProbablityOfRandomlySelectedTransactionBelongsTo(issue);
@@ -89,8 +91,23 @@ public class Node {
 		System.out.println(pX1Y1/(pX1*pY1));
 		System.out.println(pX0Y0/(pX0*pY0));
 		*/
-		if (pX0 <= 0 || pX0Y0 <= 0 || pX1<=0 || pX1Y1<=0 || pY0<=0 || pY1<=0) {
-			return -1; // means error
+		if (pX0 <= 0 ) {
+			System.out.println("pX0 "+pX0);
+		}
+		if (pX0Y0 <= 0 ) {
+			System.out.println("pX0Y0 "+pX0Y0);
+		}
+		if (pX1<=0 ) {
+			System.out.println("pX1 "+pX1);
+		}
+		if ( pX1Y1<=0) {
+			System.out.println("pX1Y1 "+pX1Y1);
+		}
+		if (pY0<=0 ) {
+			System.out.println("pY0 "+pY0);
+		}
+		if ( pY1<=0) {
+			System.out.println("pY1 "+pY1);
 		}
 		MI += pX1Y1 * Math.log10(pX1Y1/(pX1*pY1));
 		MI += pX0Y0 * Math.log10(pX0Y0/(pX0*pY0));
