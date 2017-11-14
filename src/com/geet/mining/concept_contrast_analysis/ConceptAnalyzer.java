@@ -26,11 +26,26 @@ public class ConceptAnalyzer {
 		int i=0;
 		for (Event event : issue.getEvents()) {
 			event.setValue(i);
+			for (String moduleKey : issue.getTransactionModules().keySet()) {
+				for (Event evt : issue.getTransactionModules().get(moduleKey).eventSet) {
+					if (evt.getEventString().equals(event.getEventString())) {
+						evt.setValue(i);
+					}
+				}
+			}
 			i++;
 		}
-		for (Event event : issue.getEvents()) {
+		/*for (Event event : issue.getEvents()) {
 			System.out.println(event.getEventString()+","+event.getValue());
 		}
+		System.out.println("Transactions");
+		for (String moduleKey : issue.getTransactionModules().keySet()) {
+			System.out.println(moduleKey);
+			for (Event evt : issue.getTransactionModules().get(moduleKey).eventSet) {
+				System.out.println(evt.getEventString()+","+evt.getValue());
+			}
+		}*/
+
 	}
 
 	// Generate all the nodes of fca graph of an issue
@@ -39,15 +54,17 @@ public class ConceptAnalyzer {
 	public Set<Node> generateNodesOfGraph() {
 		Set<Node> nodes = new HashSet<Node>();
 		List<Event> attributes = new ArrayList<>(Event.getClonedEvents(issue.getEvents()));
-		System.out.println("Eventsssssssss");
+		/*System.out.println("Eventsssssssss");
 		for (Event event : attributes) {
 			System.out.println(event+","+event.getValue());
-		}
+		}*/
 		Set<Event> closedSet = getFirstClosure();
 		int i = 0;
 		while (i < 50) {
 			System.out.println("No. " + i + ": Closed Sets " + closedSet);
-			nodes.add(generateNodeFromAClosedSet(Event.getClonedEvents(closedSet)));
+			Node node = generateNodeFromAClosedSet(Event.getClonedEvents(closedSet));
+			System.out.println(node);
+			nodes.add(node);
 			if (closedSet.equals(issue.getEvents())) {
 				break;
 			}
@@ -144,7 +161,7 @@ public class ConceptAnalyzer {
 		// else return false
 		for (Event event : diff) {
 			//if (eventM.getEventString().compareTo(event.getEventString()) > 0) {
-			System.out.println(eventM.getValue()+","+event.getValue());
+			//System.out.println(eventM.getValue()+","+event.getValue());
 			if(eventM.getValue() > event.getValue()){
 				// System.out.println("Smallest New Element "+ event);
 				return true;
@@ -165,7 +182,7 @@ public class ConceptAnalyzer {
 				generatedNode.setFail(generatedNode.getFail() + transactionModule.fail);
 			}
 		}
-		System.out.println(generatedNode);
+		// System.out.println(generatedNode);
 		return generatedNode;
 	}
 

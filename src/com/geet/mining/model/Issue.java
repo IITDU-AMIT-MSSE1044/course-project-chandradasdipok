@@ -81,13 +81,13 @@ public class Issue implements Comparable<Issue> {
 	// indicates the probability of fail of randomly selected transaction
 	// given the issue
 	public double getProbablityOfFailOfRandomlySelectedTransaction() {
-		return (double) getFail() / ((double) getFail() + getSucceed());
+		return (double) (getFail()) / ((double) getFail() + getSucceed());
 	}
 
 	// indicates the probability of succeed of randomly selected transaction
 	// given the issue
 	public double getProbablityOfSuccessOfRandomlySelectedTransaction() {
-		return (double) getSucceed() / ((double) getFail() + getSucceed());
+		return (double) (getSucceed()) / ((double) getFail() + getSucceed());
 	}
 
 	public int getFail() {
@@ -125,24 +125,31 @@ public class Issue implements Comparable<Issue> {
 
 	// generate the signatures for the given issue
 	public void generateSignatures() {
-		
-		
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
-		
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
-		
-		
 		// traverse all the nodes
 		// store the traversed nodes in previousNodes
-		for (Node currentNode : Node.clonedNodes(getNodes())) {
+/*		System.out.println("Nodesssssssssssssssssssss");
+		System.out.println(getNodes().toString());
+		System.out.println("Nodesssssssssssssssssssss");
+		
+*/		// calculate all the MI
+		
+		System.out.println("Generating Signatures...");
+		for (Node node : getNodes()) {
+			node.setMI(node.getMutualInformationGivenIssue(this));
+			System.out.println(node);
+		}
+		
+		for (Node currentNode : Node.clonedNodes(getNodes(),this)) {
 			// retrieve the nodes those are super concept of the current Node
 			// A node is super of current Node if the node is sub set of current Node
 			// store all the super nodes as candidate nodes from the previous
 			// nodes
 			System.out.println("Current Node :" + currentNode);
 			Set<Node> parentNodes = new HashSet<Node>();
-			for (Node storedNode : Node.clonedNodes(getNodes())) {
+			for (Node storedNode : Node.clonedNodes(getNodes(),this)) {
 				if (currentNode.isChildtOf(storedNode)) {
 					// add stored node to parent nodes
 					// System.out.println(currentNode+" is child of "+storedNode);
@@ -166,41 +173,39 @@ public class Issue implements Comparable<Issue> {
 					}
 					if (!isStoredNodePresentAsParent) {
 						// System.out.println("added "+storedNode);
-						parentNodes.add(storedNode.toClone());
+						parentNodes.add(storedNode.toClone(this));
 					} else {
 						// System.out.println("ignored "+storedNode);
 					}
 				}
 			}
-			System.out.println("Parents :" + parentNodes);
-
-			
+			System.out.println("Parents :" + parentNodes);			
 			// calculate the mutual information between current nodes and parent node
 			// and store if full fill certain criteria
 			// if the mutual information of current node is greater than zero
 			// and the difference between current node and child node is non zero
-			double MICurrentNode = currentNode
-					.getMutualInformationGivenIssue(this);
-			if (MICurrentNode > 0) {
+			//if (MIOfCurrentNode > 0) {
 				for (Node node : parentNodes) {
 					// DMI - Delta Mutual Information
-					double MIParentNode = node
-							.getMutualInformationGivenIssue(this);
-					double DMI = MICurrentNode - MIParentNode;
-					if (DMI > 0) {
-						Set<String> events = new HashSet<String>();
-						Set<Event> suspectEvents = Event
-								.getClonedEvents(currentNode.getClosedSet());
-						suspectEvents.retainAll(Event.getClonedEvents(node
-								.getClosedSet()));
-						for (Event event : suspectEvents) {
-							events.add(event.getEventString());
-						}
-						Term term = new Term(events, DMI);
-						signatures.put(term, term.getDMIAsWeight());
+					if (node.getMI() > 0 && currentNode.getMI() > 0) {
+						double DMI = currentNode.getMI() - node.getMI();
+						if (DMI > 0) {
+							Set<String> events = new HashSet<String>();
+							Set<Event> suspectEvents = Event
+									.getClonedEvents(currentNode.getClosedSet());
+							suspectEvents.retainAll(Event.getClonedEvents(node
+									.getClosedSet()));
+							for (Event event : suspectEvents) {
+								events.add(event.getEventString());
+							}
+							Term term = new Term(events, DMI);
+							signatures.put(term, term.getDMIAsWeight());
+							System.out.println("Signatures...");
+							System.out.println(term);
+						}						
 					}
 				}
-			}
+			//}
 		}
 	}
 	
