@@ -77,43 +77,43 @@ public class Node {
 		System.out.println(this);
 		double MI= 0.0;
 		double n=issue.getFail(),m=issue.getSucceed(),x=getFail(),y=getSucceed();
-		double pX1 = getProbablityOfRandomlySelectedTransactionBelongsTo(issue);
-		double pX0 = getProbablityOfRandomlySelectedTransactionNotBelongsTo(issue);
-		double pY1 = issue.getProbablityOfFailOfRandomlySelectedTransaction();
-		double pY0 = issue.getProbablityOfSuccessOfRandomlySelectedTransaction();
-		double pX1Y1 =  ((double) (x) / (n+m));
-//		System.out.println(pX0 <= 0+","+pX0Y0+","+pX1+","+pX1Y1+","+pY0+","+pY1);
-//		System.out.println("XOYO"+(m-y));
-		double pX0Y0 =  ((double) (m-y) / (n+m));
-//		System.out.println("Prbos");
-//		System.out.println(pX0+","+pX0Y0+","+pX1+","+pX1Y1+","+pY0+","+pY1);
-		/*System.out.println("Checking.....");
-		System.out.println(pX1Y1/(pX1*pY1));
-		System.out.println(pX0Y0/(pX0*pY0));
-		*/
-		if (pX0 <= 0 ) {
-			System.out.println("pX0 "+pX0);
+		double N = n+m;
+		double pX1Y1 = (x)/N;
+		double pX1= (x+y)/N;
+		double pY1= (n)/N;
+		double pX0Y0 = (m - y) / N;
+		double pX0 = (N-(n+m)) / N;
+		double pY0 = (m) / N;
+		if (pX1Y1!=0 && pX1!=0 && pY1!=0) {
+			MI += Math.log10(pX1Y1/(pX1*pY1))/Math.log10(2.0);
 		}
-		if (pX0Y0 <= 0 ) {
-			System.out.println("pX0Y0 "+pX0Y0);
+		if (pX0Y0!=0 && pX0!=0 && pY0!=0) {
+			MI += pX0Y0*Math.log10(pX0Y0/(pX0*pY0))/Math.log10(2.0);
 		}
-		if (pX1<=0 ) {
-			System.out.println("pX1 "+pX1);
-		}
-		if ( pX1Y1<=0) {
-			System.out.println("pX1Y1 "+pX1Y1);
-		}
-		if (pY0<=0 ) {
-			System.out.println("pY0 "+pY0);
-		}
-		if ( pY1<=0) {
-			System.out.println("pY1 "+pY1);
-		}
-		MI += pX1Y1 * Math.log10(pX1Y1/(pX1*pY1));
-		MI += pX0Y0 * Math.log10(pX0Y0/(pX0*pY0));
 		return MI;
 	}
 	
+	
+	public static void main(String[] args) {
+		double MI= 0.0;
+		double n=223,m=486,x=0,y=0;
+		double N = n+m;
+		double pX1Y1 = (x)/N;
+		double pX1= (x+y)/N;
+		double pY1= (n)/N;
+
+		double pX0Y0 = (m - y) / N;
+		double pX0 = (N-(n+m)) / N;
+		double pY0 = (m) / N;
+
+		if (pX1Y1!=0 && pX1!=0 && pY1!=0) {
+			MI += Math.log10(pX1Y1/(pX1*pY1))/Math.log10(2.0);
+		}
+		if (pX0Y0!=0 && pX0!=0 && pY0!=0) {
+			MI += pX0Y0*Math.log10(pX0Y0/(pX0*pY0))/Math.log10(2.0);
+		}
+		System.out.println(MI);	
+	}
 	
 	// clone of Node
 	public Node toClone(Issue issue){
