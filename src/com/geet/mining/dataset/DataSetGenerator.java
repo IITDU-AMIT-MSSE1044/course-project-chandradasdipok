@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.geet.mining.concept_contrast_analysis.InputHandler;
+import com.geet.mining.concept_analysis.InputHandler;
 import com.geet.mining.model.Event;
 import com.geet.mining.model.TransactionModule;
 

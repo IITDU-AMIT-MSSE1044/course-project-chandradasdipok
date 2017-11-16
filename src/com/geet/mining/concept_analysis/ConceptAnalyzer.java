@@ -1,4 +1,4 @@
-package com.geet.mining.concept_contrast_analysis;
+package com.geet.mining.concept_analysis;
 
 import java.util.ArrayList;
 import java.util.HashSet;

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.geet.mining.concept_contrast_analysis.ConceptAnalyzer;
+import com.geet.mining.concept_analysis.ConceptAnalyzer;
 
 /**
  * 
@@ -40,7 +40,7 @@ public class Issue implements Comparable<Issue> {
 	// the signatures of an issue
 	// the collection of terms
 	// where term is also collection of events with weight in DMI
-	// <Term,Double> := <Event Set, DMI weight>
+	// <Term,Double> := <Event Set,  weight>
 	// and We
 	private Map<Term, Double> signatures;
 
@@ -179,33 +179,23 @@ public class Issue implements Comparable<Issue> {
 					}
 				}
 			}
-			System.out.println("Parents :" + parentNodes);			
-			// calculate the mutual information between current nodes and parent node
-			// and store if full fill certain criteria
-			// if the mutual information of current node is greater than zero
-			// and the difference between current node and child node is non zero
-			//if (MIOfCurrentNode > 0) {
-				for (Node node : parentNodes) {
-					// DMI - Delta Mutual Information
-					if (node.getMI() > 0 && currentNode.getMI() > 0) {
-						double DMI = currentNode.getMI() - node.getMI();
-						if (DMI > 0) {
-							Set<String> events = new HashSet<String>();
-							Set<Event> suspectEvents = Event
-									.getClonedEvents(currentNode.getClosedSet());
-							suspectEvents.retainAll(Event.getClonedEvents(node
-									.getClosedSet()));
-							for (Event event : suspectEvents) {
-								events.add(event.getEventString());
-							}
-							Term term = new Term(events, DMI);
-							signatures.put(term, term.getDMIAsWeight());
-							System.out.println("Signatures...");
-							System.out.println(term);
-						}						
-					}
+			System.out.println("Parents :" + parentNodes);	
+			//n App2 , we do not address the weak-discrimination  phenomenon:
+			//we  first  apply  FCA and use delta events between parent and child concepts 
+			//to  define  terms  (using  grouping  information),  use  TF-IDF  as  
+			//the  weight  of  each  term,  and  finally  calculate the cosine core
+			//as the similarity metric value
+			for (Node node : parentNodes) {
+				Set<Event> setA = Event.getClonedEvents(currentNode.getClosedSet());
+				Set<Event> setB = Event.getClonedEvents(currentNode.getClosedSet());
+				setA.retainAll(setB);
+				Term term = new Term(Event.getEventsAsString(setA), 1.0);
+				if (signatures.containsKey(term)) {
+					term.setTFWeight(term.getTFWeight()+1.0);
 				}
-			//}
+				signatures.put(term, term.getTFWeight());
+			}
+			
 		}
 	}
 	
@@ -234,7 +224,7 @@ public class Issue implements Comparable<Issue> {
 		double dotProduct = 0;
 		for (Term termP : this.signatures.keySet()) {
 			for (Term termQ : issue.signatures.keySet()) {
-				dotProduct = termP.getDMIAsWeight()*termQ.getDMIAsWeight();
+				dotProduct = termP.getTFWeight()*termQ.getTFWeight();
 				Term p = termP.toClone();
 				Term q = termQ.toClone();
 				p.getEventsAsValue().retainAll(q.getEventsAsValue());

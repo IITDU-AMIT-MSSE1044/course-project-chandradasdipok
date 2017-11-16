@@ -1,4 +1,4 @@
-package com.geet.mining.concept_contrast_analysis;
+package com.geet.mining.concept_analysis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -154,8 +154,6 @@ public class InputHandler {
 			System.out.println();
 		}
 	}	
-	
-	
 	public static void main(String[] args) {
 		InputHandler context = new InputHandler();
 		context.readIssueFromDirectory("src/com/geet/mining/input/issue_01/");

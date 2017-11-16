@@ -86,4 +86,11 @@ public class Event implements Comparable<Event>,Cloneable{
 		return clonedEvents;
 	}
 	
+	public static Set<String> getEventsAsString(Set<Event>events){
+		Set<String> stringEvents = new HashSet<String>();
+		for (Event event : events) {
+			stringEvents.add(event.eventString);
+		}
+		return stringEvents;
+	}
 }
