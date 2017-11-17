@@ -1,6 +1,7 @@
 package com.geet.mining.concept_analysis;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -35,7 +36,9 @@ public class ConceptAnalyzer {
 			}
 			i++;
 		}
-		/*for (Event event : issue.getEvents()) {
+	//
+		/*
+		for (Event event : issue.getEvents()) {
 			System.out.println(event.getEventString()+","+event.getValue());
 		}
 		System.out.println("Transactions");
@@ -44,7 +47,8 @@ public class ConceptAnalyzer {
 			for (Event evt : issue.getTransactionModules().get(moduleKey).eventSet) {
 				System.out.println(evt.getEventString()+","+evt.getValue());
 			}
-		}*/
+		}
+	//*/
 
 	}
 
@@ -60,10 +64,10 @@ public class ConceptAnalyzer {
 		}*/
 		Set<Event> closedSet = getFirstClosure();
 		int i = 0;
-		while (i < 50) {
-			System.out.println("No. " + i + ": Closed Sets " + closedSet);
+		while (i < 100) {
+			//System.out.println("No. " + i + ": Closed Sets " + closedSet);
 			Node node = generateNodeFromAClosedSet(Event.getClonedEvents(closedSet));
-			System.out.println(node);
+			System.out.println("No. " + i + ": Node "+node);
 			nodes.add(node);
 			if (closedSet.equals(issue.getEvents())) {
 				break;
@@ -81,33 +85,36 @@ public class ConceptAnalyzer {
 	}
 
 	// next closure algorithms
-		// The algorithm is proposed by Ganter et. al at 1992
-		private Set<Event> getNextClosedSet(Set<Event> closedSet, List<Event> attributes) {
-			for (int i = attributes.size() - 1; i >= 0; i--) {
-				Set<Event> nextClosedSet = new HashSet<Event>();
-				Event m = attributes.get(i);
-				// System.out.println("Element "+m);
-				if (closedSet.contains(m)) {
-					closedSet.remove(m);
-					// System.out.println("Closed Set after remove "+closedSet);
-				} else {
-					nextClosedSet.addAll(closedSet);
-					nextClosedSet.add(m);
-					// System.out.println("Next Closed Set "+nextClosedSet);
-					// System.out.println("Total Events "+issue.getEvents());
-					// System.out.println("Closures:
-					// "+closureOfEvents(nextClosedSet, CONTEXT_TABLE));
-					 nextClosedSet = closureOfEvents(nextClosedSet);
-					// System.out.println("Closures of Next Closed Set
-					// "+nextClosedSet);
-					if (!hasLessThanElementM(Event.getClonedEvents(nextClosedSet), closedSet, m)) {
-						return nextClosedSet;
-					}
+	// The algorithm is proposed by Ganter et. al at 1992
+	private Set<Event> getNextClosedSet(Set<Event> closedSet, List<Event> attributes) {
+		Collections.sort(attributes);
+		for (int i = attributes.size() - 1; i >= 0; i--) {
+			Set<Event> nextClosedSet = new HashSet<Event>();
+			Event m = attributes.get(i);
+//			System.out.println("Closed Set "+closedSet);
+//			System.out.println("Element "+m);
+			if (closedSet.contains(m)) {
+				closedSet.remove(m);
+//				System.out.println("Closed Set after remove "+closedSet);
+			} else {
+				nextClosedSet.addAll(closedSet);
+				nextClosedSet.add(m);
+//				System.out.println("Next Closed Set "+nextClosedSet);
+				// System.out.println("Total Events "+issue.getEvents());
+				// System.out.println("Closures:
+				// "+closureOfEvents(nextClosedSet, CONTEXT_TABLE));
+				nextClosedSet = closureOfEvents(nextClosedSet);
+//				System.out.println("Closures of Next Closed Set "+nextClosedSet);
+				if (!hasLessThanElementM(Event.getClonedEvents(nextClosedSet), Event.getClonedEvents(closedSet), m)) {
+					return nextClosedSet;
+				}else{
+					
 				}
 			}
-			return new HashSet<Event>();
 		}
-	
+		return new HashSet<Event>();
+	}
+
 	// Here events are attributes of FCA
 	// It takes the attribute set
 	// returns the closures of given attributes

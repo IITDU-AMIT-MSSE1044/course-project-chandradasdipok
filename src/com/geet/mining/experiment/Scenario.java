@@ -1,6 +1,7 @@
 package com.geet.mining.experiment;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.geet.mining.dataset.DataSetGenerator;
@@ -25,8 +26,15 @@ public abstract class Scenario {
 	
 	protected List<Issue> retrieveHistoricalIssues(Issue nIssue, List<Issue>hitoricalIssues){
 		for (int i = 0; i < hitoricalIssues.size(); i++) {
-			
+			hitoricalIssues.get(i).setCosine(nIssue);
 		}
-		return null;
+		Collections.sort(hitoricalIssues);
+		return hitoricalIssues;
+	}
+	public static void main(String[] args) {
+		ScenarioA scenarioA = new ScenarioA();
+		for (Issue issue : scenarioA.allIssues) {
+			System.out.println(issue.toDocumentRepresentation());
+		}
 	}
 }

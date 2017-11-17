@@ -74,7 +74,11 @@ public class Issue implements Comparable<Issue> {
 				getEvents().add(transaction.getEvent());
 			}
 			// set the transaction types
-			getTransactionModules().put(transaction.getTransactionID(), transactionModule);			
+			getTransactionModules().put(transaction.getTransactionID(), transactionModule);
+		}
+		System.out.println(transactions.size());
+		for (String key : getTransactionModules().keySet()) {
+			System.out.println(getTransactionModules().get(key));
 		}
 		generateSignatures();
 	}
@@ -88,13 +92,7 @@ public class Issue implements Comparable<Issue> {
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
-
-		
 		System.out.println("Generating Signatures...");
-		for (Node node : getNodes()) {
-			node.setMI(node.getMutualInformationGivenIssue(this));
-			System.out.println(node);
-		}
 		
 		for (Node currentNode : Node.clonedNodes(getNodes(),this)) {
 			// retrieve the nodes those are super concept of the current Node
@@ -142,17 +140,16 @@ public class Issue implements Comparable<Issue> {
 			for (Node node : parentNodes) {
 				Set<Event> setA = Event.getClonedEvents(currentNode.getClosedSet());
 				Set<Event> setB = Event.getClonedEvents(node.getClosedSet());
-				setA.retainAll(setB);
+				setA.removeAll(setB);
 				Term term = new Term(Event.getEventsAsString(setA), 1.0);
+				System.out.println(currentNode.getClosedSet()+"-"+node.getClosedSet()+"="+setA+":"+term.getTFWeight());
 				if (signatures.containsKey(term)) {
 					term.setTFWeight(term.getTFWeight()+1.0);
 				}
 				signatures.put(term, term.getTFWeight());
 			}
-			
 		}
 	}
-	
 	
 	public Issue toClone(){
 		return new Issue(Transaction.toCloneTransactions(getTransactions()));
@@ -176,8 +173,7 @@ public class Issue implements Comparable<Issue> {
 			flag++;
 		}
 		flag = 0;
-		System.out.println(transactionTypeArray.toString());
-		System.out.println(eventsArray.toString());
+		System.out.println("\t"+eventsArray.toString());
 		for (int i = 0; i < transactionTypeArray.length; i++) {
 			for (int j = 0; j < eventsArray.length; j++) {
 				if (getTransactionModules().get(transactionTypeArray[i]).eventSet.contains(eventsArray[j])) {
@@ -223,7 +219,7 @@ public class Issue implements Comparable<Issue> {
 		return Math.sqrt(scalarValue);
 	}
 
-	public double getDotProduct(Issue issue) {
+	private double getDotProduct(Issue issue) {
 		double dotProduct = 0;
 		for (Term termP : this.signatures.keySet()) {
 			for (Term termQ : issue.signatures.keySet()) {
@@ -249,12 +245,10 @@ public class Issue implements Comparable<Issue> {
 
 	@Override
 	public int compareTo(Issue issue) {
-		if (cosine == -1) {
-			setCosine(issue);
-		}
-		return (cosine > issue.cosine) ? 1 : 0;
+		double value = cosine-issue.cosine; 
+		return (value !=0 )? (int)(value/Math.abs(value)):0; 
 	}
-
+	
 	// setter-getter
 	public List<Transaction> getTransactions() {
 		return transactions;

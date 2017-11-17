@@ -97,11 +97,11 @@ public class Transaction {
 		}
 		public Transaction build(){
 			Transaction transaction = new Transaction();
-			transaction.setTime(time);
-			transaction.setEvent(event);
-			transaction.setTransactionID(transactionID);;
-			transaction.setLog(log);
-			transaction.setTransactionStatus(transactionStatus);;
+			transaction.setTime(this.time);
+			transaction.setEvent(this.event);
+			transaction.setTransactionID(this.transactionID);;
+			transaction.setLog(this.log);
+			transaction.setTransactionStatus(this.transactionStatus);;
 			return transaction;
 		}
 	}
@@ -109,7 +109,7 @@ public class Transaction {
 	
 	@Override
 	public String toString() {
-		return time+","+event+","+transactionID+","+log+","+transactionStatus;
+		return event+","+transactionID+","+transactionStatus;
 	}
 	
 }

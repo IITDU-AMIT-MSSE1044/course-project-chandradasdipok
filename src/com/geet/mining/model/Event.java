@@ -69,7 +69,7 @@ public class Event implements Comparable<Event>,Cloneable{
 
 	@Override
 	public int compareTo(Event o) {
-		return (o.value-value);
+		return (value-o.value);
 	}
 	
 	public Event clone(){

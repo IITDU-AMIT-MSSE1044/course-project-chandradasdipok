@@ -191,17 +191,20 @@ public class DataSetGenerator {
 		Random random = new Random();
 		int moduleSize = modules.size();
 		int counter = 0;
-		while (counter < 10 || random.nextBoolean()) {
+		while (counter < 2 || random.nextBoolean()) {
 			// first transaction ID
 			int moduleToPick = random.nextInt(moduleSize);
 			TransactionModule transactionModule= setTransactionModuleData(moduleString.get(moduleToPick),0,0); 
 			for (Event event:transactionModule.eventSet) {
 				String transactionID = transactionModule.transactionID;
+				//System.out.println(transactionID+" "+event);
 				Status transactionStatus = Status.SUCCESS;
 				if(random.nextBoolean()){
 					transactionStatus= Status.FAILURE;
 				}
+				
 				Transaction transaction = new TransactionBuilder().event(event).transactionID(transactionID).transactionStatus(transactionStatus).build();
+				System.out.println(transaction);
 				transactions.add(transaction);
 			}
 			counter++;
@@ -213,6 +216,7 @@ public class DataSetGenerator {
 	public static void main(String[] args) {
 		DataSetGenerator dataSetGenerator = new DataSetGenerator();
 		Issue issue = new Issue(dataSetGenerator.executeRandomTransactions());
+		System.out.println("Signatures");
 		System.out.println(issue.toDocumentRepresentation());
 	}
 }

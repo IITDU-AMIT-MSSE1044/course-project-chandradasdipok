@@ -63,7 +63,6 @@ public class Term {
 		for (String event : getEventsAsValue()) {
 			toString+=event+",";
 		}
-		toString+=TF_Weight;
 		return toString;
 	}
 	public static void main(String[] args) {
