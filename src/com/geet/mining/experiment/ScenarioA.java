@@ -1,5 +1,6 @@
 package com.geet.mining.experiment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.geet.mining.model.Issue;
@@ -21,9 +22,12 @@ public class ScenarioA extends Scenario{
 	 */
 	
 	@Override
-	protected Issue retrieveHistoricalIssues() {
-		Issue historicalIssue;
-		historicalIssue = new Issue();
-		return historicalIssue;
+	public List<Issue> getHistoricalIssues(int index) {
+		List<Issue> historicalIssues = new ArrayList<Issue>();
+		for (int i = 0; i<index && i < allIssues.size(); i++) {
+			historicalIssues.add(allIssues.get(i));
+		}
+		return historicalIssues;
 	}
+	
 }

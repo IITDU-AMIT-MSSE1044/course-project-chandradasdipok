@@ -157,7 +157,7 @@ public class InputHandler {
 	public static void main(String[] args) {
 		InputHandler context = new InputHandler();
 		context.readIssueFromDirectory("src/com/geet/mining/input/issue_01/");
-		context.issue.generateSignatures();
+		
 	}
 
 }

@@ -18,7 +18,6 @@ import com.geet.mining.concept_analysis.ConceptAnalyzer;
  */
 public class Issue implements Comparable<Issue> {
 
-	boolean isSigAvail = false;
 	
 	public Issue() {
 		transactions = new ArrayList<Transaction>();
@@ -28,7 +27,8 @@ public class Issue implements Comparable<Issue> {
 		nodes = new HashSet<Node>();
 		healingAction = null;
 	}
-
+	
+	public boolean isSigAvail = false;
 	// nodes of FCA graph representation of an issue
 	private Set<Node> nodes;
 	// failed transaction and succeeded transactions given a issue
@@ -43,16 +43,17 @@ public class Issue implements Comparable<Issue> {
 	// <Term,Double> := <Event Set,  weight>
 	// and We
 	private Map<Term, Double> signatures;
-
 	// each issue is consists of some modules named
 	private Map<String, TransactionModule> transactionModules;
-
 	// latest cosine value with another issue
 	private double cosine = -1;
-
 	// set of events
 	private Set<Event> events;
 
+	
+	
+	
+	
 	public List<Transaction> getTransactions() {
 		return transactions;
 	}
@@ -125,6 +126,7 @@ public class Issue implements Comparable<Issue> {
 
 	// generate the signatures for the given issue
 	public void generateSignatures() {
+		isSigAvail=true;
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
@@ -263,6 +265,33 @@ public class Issue implements Comparable<Issue> {
 			transactionModules.put(module.transactionID, module);
 			events.addAll(Event.getClonedEvents(module.eventSet));
 		}
+		generateSignatures();
 	}
 	
+	public Issue toClone(){
+		Issue issue = new Issue();
+		issue.isSigAvail = isSigAvail;
+		// nodes of FCA graph representation of an issue
+		issue.nodes=Node.clonedNodes(nodes, this);
+		// failed transaction and succeeded transactions given a issue
+		issue.fail = fail;
+		issue.succeed = succeed;
+		// log messages of an issue
+		issue.transactions= transactions;
+		// healing action of an issue
+		issue.healingAction=healingAction;
+		// the signatures of an issue
+		// the collection of terms
+		// where term is also collection of events with weight in DMI
+		// <Term,Double> := <Event Set,  weight>
+		// and We
+		issue.signatures=signatures;
+		// each issue is consists of some modules named
+		issue.transactionModules=transactionModules;
+		// latest cosine value with another issue
+		issue.cosine = -1;
+		// set of events
+		issue.events=Event.getClonedEvents(events);
+		return issue;
+	}
 }

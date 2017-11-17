@@ -19,6 +19,10 @@ public class DataSetGenerator {
 	static Set<Event> allEvents = new HashSet<Event>();
 	static List<String> moduleString = new ArrayList<String>();
 
+	public DataSetGenerator() {
+		initializeModules();
+	}
+	
 	private static void initializeEvents() {
 		allEvents.add(new Event("a"));
 		allEvents.add(new Event("b"));
@@ -50,6 +54,18 @@ public class DataSetGenerator {
 		return null;
 	}
 
+	public Issue getRandomIssue(){
+		Issue randomIssue=null;
+		InputHandler inputHandler = new InputHandler();
+		if(inputHandler.readIssueFromTransactionModules(executeRandomTransactions())){
+			randomIssue = inputHandler.issue;
+		}else{
+			randomIssue = new Issue();
+		}
+		return randomIssue;
+	}
+	
+	
 	private static void initializeModules() {
 		initializeEvents();
 		TransactionModule module = new TransactionModule();
@@ -168,30 +184,7 @@ public class DataSetGenerator {
 		}
 		return null;
 	}
-	
-	public static void main(String[] args) {
-		initializeModules();
-/*		for (TransactionModule module : modules) {
-			System.out.println(module.toString());
-		}
-		// ten issues
-		Issue [] historicalIssues = new Issue[10];
-		List<TransactionModule> issueModules = new ArrayList<TransactionModule>();
-		issueModules.add(setTransactionModuleData("T1", 36, 1));
-		issueModules.add(setTransactionModuleData("T5", 187, 0));
-		issueModules.add(setTransactionModuleData("T7", 0, 485));
-		InputHandler inputHandler = new InputHandler();
-		inputHandler.readIssueFromTransactionModules(issueModules);
-		inputHandler.issue.generateSignatures();
-		historicalIssues[0]= inputHandler.issue;
-*/		
-		List<TransactionModule> sampleModules = executeRandomTransactions();
-		System.out.println(sampleModules);
-		InputHandler inputHandler = new InputHandler();
-		inputHandler.readIssueFromTransactionModules(sampleModules);
-		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(inputHandler.issue);
-		conceptAnalyzer.generateNodesOfGraph();
-	}
+
 	
 	private static List<TransactionModule> executeRandomTransactions(){
 		// transactionID to be random but belongs to transaction modules type
@@ -206,6 +199,7 @@ public class DataSetGenerator {
 			int moduleToPick = random.nextInt(moduleSize);
 			TransactionModule transactionModule= setTransactionModuleData(moduleString.get(moduleToPick),0,0); 
 			for (int i=0; i<transactionModule.eventSet.size();i++) {
+				
 				if (random.nextBoolean()) {
 					transactionModule.fail++;
 				} else {
