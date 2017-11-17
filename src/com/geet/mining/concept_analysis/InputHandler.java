@@ -27,7 +27,7 @@ public class InputHandler {
 	private boolean [][] CONTEXT_TABLE;
 
 	
-	public boolean readIssueFromTransactionModules(List<TransactionModule>modules){
+	/*public boolean readIssueFromTransactionModules(List<TransactionModule>modules){
 		issue = new Issue();
 		for (TransactionModule module : modules) {
 			issue.getEvents().addAll(Event.getClonedEvents(module.eventSet));
@@ -40,7 +40,7 @@ public class InputHandler {
 		System.out.println(issue.getEvents());
 		return false;
 	}
-	
+	*/
 	// read each issue from an directory
 	public boolean readIssueFromDirectory(String dirPath){
 		issue = new Issue();

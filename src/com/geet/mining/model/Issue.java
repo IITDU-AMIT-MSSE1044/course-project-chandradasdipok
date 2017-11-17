@@ -18,16 +18,8 @@ import com.geet.mining.concept_analysis.ConceptAnalyzer;
  */
 public class Issue implements Comparable<Issue> {
 
-	
-	public Issue() {
-		transactions = new ArrayList<Transaction>();
-		events = new HashSet<Event>();
-		transactionModules = new HashMap<String, TransactionModule>();
-		signatures = new HashMap<Term, Double>();
-		nodes = new HashSet<Node>();
-		healingAction = null;
-	}
-	
+
+	private boolean [][] CONTEXT_TABLE;
 	public boolean isSigAvail = false;
 	// nodes of FCA graph representation of an issue
 	private Set<Node> nodes;
@@ -49,94 +41,54 @@ public class Issue implements Comparable<Issue> {
 	private double cosine = -1;
 	// set of events
 	private Set<Event> events;
-
+	
+	public Issue() {
+		transactions = new ArrayList<Transaction>();
+		events = new HashSet<Event>();
+		transactionModules = new HashMap<String, TransactionModule>();
+		signatures = new HashMap<Term, Double>();
+		nodes = new HashSet<Node>();
+		healingAction = null;
+	}
+	
+	public Issue(List<Transaction> transactions){
+		this();
+		for (Transaction transaction : transactions) {
+			TransactionModule transactionModule = null;
+			if (getTransactionModules().containsKey(transaction.getTransactionID())) {
+				transactionModule = getTransactionModules().get(transaction.getTransactionID());
+			} else {
+				transactionModule = new TransactionModule();
+				transactionModule.transactionID = (transaction.getTransactionID());
+			}
+			transactionModule.eventSet.add(transaction.getEvent());
+			if (transaction.getTransactionStatus() == Status.FAILURE) {
+				transactionModule.fail++;
+				setFail(getFail()+1);
+			} else {
+				transactionModule.succeed++;
+				setSucceed(getSucceed()+1);
+			}
+			// set the full event set
+			if (!getEvents().contains(transaction.getEvent())) {
+				getEvents().add(transaction.getEvent());
+			}
+			// set the transaction types
+			getTransactionModules().put(transaction.getTransactionID(), transactionModule);			
+		}
+		generateSignatures();
+	}
 	
 	
-	
-	
-	public List<Transaction> getTransactions() {
-		return transactions;
-	}
-
-	public void setLog(List<Transaction> transactions) {
-		this.transactions = transactions;
-	}
-
-	public Map<String, TransactionModule> getTransactionModules() {
-		return transactionModules;
-	}
-
-	public void setTransactionModules(
-			Map<String, TransactionModule> transactionModules) {
-		this.transactionModules = transactionModules;
-	}
-
-	public Set<Event> getEvents() {
-		return events;
-	}
-
-	public void setEvents(Set<Event> events) {
-		this.events = events;
-	}
-
-	// indicates the probability of fail of randomly selected transaction
-	// given the issue
-	public double getProbablityOfFailOfRandomlySelectedTransaction() {
-		return (double) (getFail()) / ((double) getFail() + getSucceed());
-	}
-
-	// indicates the probability of succeed of randomly selected transaction
-	// given the issue
-	public double getProbablityOfSuccessOfRandomlySelectedTransaction() {
-		return (double) (getSucceed()) / ((double) getFail() + getSucceed());
-	}
-
-	public int getFail() {
-		return fail;
-	}
-
-	public void setFail(int fail) {
-		this.fail = fail;
-	}
-
-	public int getSucceed() {
-		return succeed;
-	}
-
-	public void setSucceed(int succeed) {
-		this.succeed = succeed;
-	}
-
-	private Set<Node> getNodes() {
-		return nodes;
-	}
-
-	private void setNodes(Set<Node> nodes) {
-		this.nodes = nodes;
-	}
-
-
-	public HealingAction getHealingAction() {
-		return healingAction;
-	}
-
-	public void setHealingAction(HealingAction healingAction) {
-		this.healingAction = healingAction;
-	}
-
 	// generate the signatures for the given issue
 	public void generateSignatures() {
 		isSigAvail=true;
+		// Print the context table
+		printContextTable();
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
-		// traverse all the nodes
-		// store the traversed nodes in previousNodes
-/*		System.out.println("Nodesssssssssssssssssssss");
-		System.out.println(getNodes().toString());
-		System.out.println("Nodesssssssssssssssssssss");
-		
-*/		// calculate all the MI
+
 		
 		System.out.println("Generating Signatures...");
 		for (Node node : getNodes()) {
@@ -189,7 +141,7 @@ public class Issue implements Comparable<Issue> {
 			//as the similarity metric value
 			for (Node node : parentNodes) {
 				Set<Event> setA = Event.getClonedEvents(currentNode.getClosedSet());
-				Set<Event> setB = Event.getClonedEvents(currentNode.getClosedSet());
+				Set<Event> setB = Event.getClonedEvents(node.getClosedSet());
 				setA.retainAll(setB);
 				Term term = new Term(Event.getEventsAsString(setA), 1.0);
 				if (signatures.containsKey(term)) {
@@ -200,6 +152,55 @@ public class Issue implements Comparable<Issue> {
 			
 		}
 	}
+	
+	
+	public Issue toClone(){
+		return new Issue(Transaction.toCloneTransactions(getTransactions()));
+	}
+	
+	// build the context table of issue
+	private void setContextTable() {
+		CONTEXT_TABLE = new boolean[getTransactionModules().size()][getEvents().size()];
+		// event set is converted to array
+		Event[] eventsArray = new Event[getEvents().size()];
+		int flag = 0;
+		for (Event event : getEvents()) {
+			eventsArray[flag] = event;
+			flag++;
+		}
+		// transaction modules keys set is converted into an array
+		flag = 0;
+		String[] transactionTypeArray = new String[getTransactionModules().keySet().size()];
+		for (String transaction : getTransactionModules().keySet()) {
+			transactionTypeArray[flag] = transaction;
+			flag++;
+		}
+		flag = 0;
+		System.out.println(transactionTypeArray.toString());
+		System.out.println(eventsArray.toString());
+		for (int i = 0; i < transactionTypeArray.length; i++) {
+			for (int j = 0; j < eventsArray.length; j++) {
+				if (getTransactionModules().get(transactionTypeArray[i]).eventSet.contains(eventsArray[j])) {
+					CONTEXT_TABLE[i][j] = true;
+				}
+			}
+		}
+	}
+	// print the context table of issue
+	private void printContextTable() {
+		setContextTable();
+		System.out.println(getEvents().toString());
+		System.out.println(getTransactionModules().keySet().toString());
+		for (int i = 0; i < CONTEXT_TABLE.length; i++) {
+			for (int j = 0; j < CONTEXT_TABLE[i].length; j++) {
+				// print 1 for true and 0 for false
+				System.out.print((CONTEXT_TABLE[i][j] ? 1 : 0) + " ");
+			}
+			System.out.println();
+		}
+		CONTEXT_TABLE = null;
+	}
+
 	
 	//---------- Similar Issue Retrieval------------//
 	
@@ -254,44 +255,60 @@ public class Issue implements Comparable<Issue> {
 		return (cosine > issue.cosine) ? 1 : 0;
 	}
 
-	public Issue(List<TransactionModule> modules){
-		transactions = new ArrayList<Transaction>();
-		events = new HashSet<Event>();
-		transactionModules = new HashMap<String, TransactionModule>();
-		signatures = new HashMap<Term, Double>();
-		nodes = new HashSet<Node>();
-		healingAction = null;
-		for (TransactionModule module : modules) {
-			transactionModules.put(module.transactionID, module);
-			events.addAll(Event.getClonedEvents(module.eventSet));
-		}
-		generateSignatures();
+	// setter-getter
+	public List<Transaction> getTransactions() {
+		return transactions;
 	}
-	
-	public Issue toClone(){
-		Issue issue = new Issue();
-		issue.isSigAvail = isSigAvail;
-		// nodes of FCA graph representation of an issue
-		issue.nodes=Node.clonedNodes(nodes, this);
-		// failed transaction and succeeded transactions given a issue
-		issue.fail = fail;
-		issue.succeed = succeed;
-		// log messages of an issue
-		issue.transactions= transactions;
-		// healing action of an issue
-		issue.healingAction=healingAction;
-		// the signatures of an issue
-		// the collection of terms
-		// where term is also collection of events with weight in DMI
-		// <Term,Double> := <Event Set,  weight>
-		// and We
-		issue.signatures=signatures;
-		// each issue is consists of some modules named
-		issue.transactionModules=transactionModules;
-		// latest cosine value with another issue
-		issue.cosine = -1;
-		// set of events
-		issue.events=Event.getClonedEvents(events);
-		return issue;
+	public void setLog(List<Transaction> transactions) {
+		this.transactions = transactions;
 	}
+	public Map<String, TransactionModule> getTransactionModules() {
+		return transactionModules;
+	}
+	public void setTransactionModules(
+			Map<String, TransactionModule> transactionModules) {
+		this.transactionModules = transactionModules;
+	}
+	public Set<Event> getEvents() {
+		return events;
+	}
+	public void setEvents(Set<Event> events) {
+		this.events = events;
+	}
+	// indicates the probability of fail of randomly selected transaction
+	// given the issue
+	public double getProbablityOfFailOfRandomlySelectedTransaction() {
+		return (double) (getFail()) / ((double) getFail() + getSucceed());
+	}
+	// indicates the probability of succeed of randomly selected transaction
+	// given the issue
+	public double getProbablityOfSuccessOfRandomlySelectedTransaction() {
+		return (double) (getSucceed()) / ((double) getFail() + getSucceed());
+	}
+	public int getFail() {
+		return fail;
+	}
+	public void setFail(int fail) {
+		this.fail = fail;
+	}
+	public int getSucceed() {
+		return succeed;
+	}
+	public void setSucceed(int succeed) {
+		this.succeed = succeed;
+	}
+	private Set<Node> getNodes() {
+		return nodes;
+	}
+	private void setNodes(Set<Node> nodes) {
+		this.nodes = nodes;
+	}
+	public HealingAction getHealingAction() {
+		return healingAction;
+	}
+	public void setHealingAction(HealingAction healingAction) {
+		this.healingAction = healingAction;
+	}
+
+
 }

@@ -1,5 +1,8 @@
 package com.geet.mining.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 
  * @author chandradasdipok
@@ -55,6 +58,19 @@ public class Transaction {
 		this.transactionStatus = transactionStatus;
 	}
 
+	public Transaction toClone(){
+		return new TransactionBuilder().event(event).time(time).transactionID(transactionID)
+				.transactionStatus(transactionStatus).log(log).build();
+	}
+	
+	public static List<Transaction> toCloneTransactions(List<Transaction> toCloneList){
+		List<Transaction> transactions = new ArrayList<Transaction>();
+		for (Transaction transaction : toCloneList) {
+			transactions.add(transaction.toClone());
+		}
+		return transactions;
+	}
+	
 	private Transaction(){};
 	
 	public static class TransactionBuilder{

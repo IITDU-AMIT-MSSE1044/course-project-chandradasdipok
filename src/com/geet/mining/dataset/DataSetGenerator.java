@@ -10,7 +10,9 @@ import com.geet.mining.concept_analysis.ConceptAnalyzer;
 import com.geet.mining.concept_analysis.InputHandler;
 import com.geet.mining.model.Event;
 import com.geet.mining.model.Issue;
+import com.geet.mining.model.Status;
 import com.geet.mining.model.Transaction;
+import com.geet.mining.model.Transaction.TransactionBuilder;
 import com.geet.mining.model.TransactionModule;
 
 public class DataSetGenerator {
@@ -55,13 +57,7 @@ public class DataSetGenerator {
 	}
 
 	public Issue getRandomIssue(){
-		Issue randomIssue=null;
-		InputHandler inputHandler = new InputHandler();
-		if(inputHandler.readIssueFromTransactionModules(executeRandomTransactions())){
-			randomIssue = inputHandler.issue;
-		}else{
-			randomIssue = new Issue();
-		}
+		Issue randomIssue=new Issue(executeRandomTransactions());		
 		return randomIssue;
 	}
 	
@@ -186,11 +182,12 @@ public class DataSetGenerator {
 	}
 
 	
-	private static List<TransactionModule> executeRandomTransactions(){
+	// randomly execute transactions and results
+	private static List<Transaction> executeRandomTransactions(){
 		// transactionID to be random but belongs to transaction modules type
 		// transaction event to random but belongs to that transaction module type
 		// transaction status to be random either 0 or 1 referring success or failure 
-		List<TransactionModule> transactionModules = new ArrayList<TransactionModule>();
+		List<Transaction> transactions = new ArrayList<Transaction>();
 		Random random = new Random();
 		int moduleSize = modules.size();
 		int counter = 0;
@@ -198,29 +195,24 @@ public class DataSetGenerator {
 			// first transaction ID
 			int moduleToPick = random.nextInt(moduleSize);
 			TransactionModule transactionModule= setTransactionModuleData(moduleString.get(moduleToPick),0,0); 
-			for (int i=0; i<transactionModule.eventSet.size();i++) {
-				
-				if (random.nextBoolean()) {
-					transactionModule.fail++;
-				} else {
-					transactionModule.succeed++;
+			for (Event event:transactionModule.eventSet) {
+				String transactionID = transactionModule.transactionID;
+				Status transactionStatus = Status.SUCCESS;
+				if(random.nextBoolean()){
+					transactionStatus= Status.FAILURE;
 				}
+				Transaction transaction = new TransactionBuilder().event(event).transactionID(transactionID).transactionStatus(transactionStatus).build();
+				transactions.add(transaction);
 			}
-			boolean doestExist = false;
-			for (TransactionModule module : transactionModules) {
-				if (module.transactionID.equals(transactionModule.transactionID)) {
-					module.fail=module.fail+transactionModule.fail;
-					module.succeed=module.succeed+transactionModule.succeed;
-					doestExist=true;
-					break;
-				}
-			}
-			if(!doestExist)transactionModules.add(transactionModule);
 			counter++;
 		}
-		return transactionModules;
+		return transactions;
 	}
 	
-	
-
+		
+	public static void main(String[] args) {
+		DataSetGenerator dataSetGenerator = new DataSetGenerator();
+		Issue issue = new Issue(dataSetGenerator.executeRandomTransactions());
+		System.out.println(issue.toDocumentRepresentation());
+	}
 }
