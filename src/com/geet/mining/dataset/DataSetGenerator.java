@@ -3,16 +3,21 @@ package com.geet.mining.dataset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
+import com.geet.mining.concept_analysis.ConceptAnalyzer;
 import com.geet.mining.concept_analysis.InputHandler;
 import com.geet.mining.model.Event;
+import com.geet.mining.model.Issue;
+import com.geet.mining.model.Transaction;
 import com.geet.mining.model.TransactionModule;
 
 public class DataSetGenerator {
 
 	static Set<TransactionModule> modules;
 	static Set<Event> allEvents = new HashSet<Event>();
+	static List<String> moduleString = new ArrayList<String>();
 
 	private static void initializeEvents() {
 		allEvents.add(new Event("a"));
@@ -66,6 +71,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T1";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 		// New Instance Starts //
@@ -77,6 +83,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T2";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 		// New Instance Starts //
@@ -88,6 +95,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T3";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 		// New Instance Starts //
@@ -99,6 +107,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T4";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 		// New Instance Starts //
@@ -113,6 +122,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T5";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 		// New Instance Starts //
@@ -127,6 +137,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T6";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 		// New Instance Starts //
@@ -140,6 +151,7 @@ public class DataSetGenerator {
 		events.add(getEvent("z"));
 		module.eventSet = Event.getClonedEvents(events);
 		module.transactionID = "T7";
+		moduleString.add(module.transactionID);
 		modules.add(module);
 		// New Instance Ends //
 	}
@@ -159,23 +171,62 @@ public class DataSetGenerator {
 	
 	public static void main(String[] args) {
 		initializeModules();
-		for (TransactionModule module : modules) {
+/*		for (TransactionModule module : modules) {
 			System.out.println(module.toString());
 		}
-		
+		// ten issues
+		Issue [] historicalIssues = new Issue[10];
 		List<TransactionModule> issueModules = new ArrayList<TransactionModule>();
 		issueModules.add(setTransactionModuleData("T1", 36, 1));
 		issueModules.add(setTransactionModuleData("T5", 187, 0));
 		issueModules.add(setTransactionModuleData("T7", 0, 485));
-		System.out.println("HHHHHHHHHHHH");
-		for (TransactionModule transactionModule : issueModules) {
-			System.out.println(transactionModule);
-		}
-		
 		InputHandler inputHandler = new InputHandler();
 		inputHandler.readIssueFromTransactionModules(issueModules);
 		inputHandler.issue.generateSignatures();
-		
+		historicalIssues[0]= inputHandler.issue;
+*/		
+		List<TransactionModule> sampleModules = executeRandomTransactions();
+		System.out.println(sampleModules);
+		InputHandler inputHandler = new InputHandler();
+		inputHandler.readIssueFromTransactionModules(sampleModules);
+		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(inputHandler.issue);
+		conceptAnalyzer.generateNodesOfGraph();
 	}
+	
+	private static List<TransactionModule> executeRandomTransactions(){
+		// transactionID to be random but belongs to transaction modules type
+		// transaction event to random but belongs to that transaction module type
+		// transaction status to be random either 0 or 1 referring success or failure 
+		List<TransactionModule> transactionModules = new ArrayList<TransactionModule>();
+		Random random = new Random();
+		int moduleSize = modules.size();
+		int counter = 0;
+		while (counter < 10 || random.nextBoolean()) {
+			// first transaction ID
+			int moduleToPick = random.nextInt(moduleSize);
+			TransactionModule transactionModule= setTransactionModuleData(moduleString.get(moduleToPick),0,0); 
+			for (int i=0; i<transactionModule.eventSet.size();i++) {
+				if (random.nextBoolean()) {
+					transactionModule.fail++;
+				} else {
+					transactionModule.succeed++;
+				}
+			}
+			boolean doestExist = false;
+			for (TransactionModule module : transactionModules) {
+				if (module.transactionID.equals(transactionModule.transactionID)) {
+					module.fail=module.fail+transactionModule.fail;
+					module.succeed=module.succeed+transactionModule.succeed;
+					doestExist=true;
+					break;
+				}
+			}
+			if(!doestExist)transactionModules.add(transactionModule);
+			counter++;
+		}
+		return transactionModules;
+	}
+	
+	
 
 }
