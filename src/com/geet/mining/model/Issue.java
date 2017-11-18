@@ -215,7 +215,7 @@ public class Issue implements Comparable<Issue> {
 	private double scalarValue() {
 		double scalarValue = 0;
 		for (Term term : signatures.keySet()) {
-			scalarValue *= signatures.get(term);
+			scalarValue += signatures.get(term)*signatures.get(term);
 		}
 		return Math.sqrt(scalarValue);
 	}
@@ -223,12 +223,8 @@ public class Issue implements Comparable<Issue> {
 	private double getDotProduct(Issue issue) {
 		double dotProduct = 0;
 		for (Term termP : this.signatures.keySet()) {
-			for (Term termQ : issue.signatures.keySet()) {
-				dotProduct = termP.getTFWeight()*termQ.getTFWeight();
-				Term p = termP.toClone();
-				Term q = termQ.toClone();
-				p.getEventsAsValue().retainAll(q.getEventsAsValue());
-				dotProduct *= p.getEventsAsValue().size();
+			if (issue.signatures.containsKey(termP)) {
+				dotProduct += this.signatures.get(termP)*issue.signatures.get(termP);
 			}
 		}
 		return dotProduct/(this.scalarValue()*issue.scalarValue());
