@@ -51,8 +51,9 @@ public class Issue implements Comparable<Issue> {
 		healingAction = null;
 	}
 	
-	public Issue(List<Transaction> transactions){
+	public Issue(List<Transaction> trs){
 		this();
+		setTransactions(trs);
 		for (Transaction transaction : transactions) {
 			TransactionModule transactionModule = null;
 			if (getTransactionModules().containsKey(transaction.getTransactionID())) {
@@ -235,8 +236,7 @@ public class Issue implements Comparable<Issue> {
 
 	// set cosine similarity value between two documents
 	public void setCosine(Issue issue) {
-		this.cosine = getDotProduct(issue)
-				/ (scalarValue() * issue.scalarValue());
+		this.cosine = getDotProduct(issue);
 	}
 
 	public double getCosine() {
@@ -269,6 +269,10 @@ public class Issue implements Comparable<Issue> {
 	public void setEvents(Set<Event> events) {
 		this.events = events;
 	}
+	public void setTransactions(List<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
 	// indicates the probability of fail of randomly selected transaction
 	// given the issue
 	public double getProbablityOfFailOfRandomlySelectedTransaction() {

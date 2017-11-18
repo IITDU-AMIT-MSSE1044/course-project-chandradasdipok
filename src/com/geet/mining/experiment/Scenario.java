@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.geet.mining.dataset.DataSetGenerator;
 import com.geet.mining.model.Issue;
+import com.geet.mining.model.Transaction;
 
 public abstract class Scenario {
 
@@ -17,8 +18,9 @@ public abstract class Scenario {
 	
 	private  void readAllHistoricalIssues(){
 		allIssues = new ArrayList<Issue>();
-		for (int i = 0; i < 10; i++) {
-			allIssues.add(dataSetGenerator.getRandomIssue());
+		InputHandler inputHandler = new InputHandler();
+		for (int i = 0; i < 50; i++) {
+			allIssues.add(inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_"+i));
 		}
 	}
 	
@@ -30,11 +32,5 @@ public abstract class Scenario {
 		}
 		Collections.sort(hitoricalIssues);
 		return hitoricalIssues;
-	}
-	public static void main(String[] args) {
-		ScenarioA scenarioA = new ScenarioA();
-		for (Issue issue : scenarioA.allIssues) {
-			System.out.println(issue.toDocumentRepresentation());
-		}
 	}
 }

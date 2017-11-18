@@ -1,13 +1,14 @@
 package com.geet.mining.dataset;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-import com.geet.mining.concept_analysis.ConceptAnalyzer;
-import com.geet.mining.concept_analysis.InputHandler;
 import com.geet.mining.model.Event;
 import com.geet.mining.model.Issue;
 import com.geet.mining.model.Status;
@@ -183,7 +184,7 @@ public class DataSetGenerator {
 
 	
 	// randomly execute transactions and results
-	private static List<Transaction> executeRandomTransactions(){
+	private List<Transaction> executeRandomTransactions(){
 		// transactionID to be random but belongs to transaction modules type
 		// transaction event to random but belongs to that transaction module type
 		// transaction status to be random either 0 or 1 referring success or failure 
@@ -191,19 +192,19 @@ public class DataSetGenerator {
 		Random random = new Random();
 		int moduleSize = modules.size();
 		int counter = 0;
-		while (counter < 2 || random.nextBoolean()) {
+		while (counter < 100 || random.nextBoolean()) {
 			// first transaction ID
 			int moduleToPick = random.nextInt(moduleSize);
 			TransactionModule transactionModule= setTransactionModuleData(moduleString.get(moduleToPick),0,0); 
 			for (Event event:transactionModule.eventSet) {
 				String transactionID = transactionModule.transactionID;
-				//System.out.println(transactionID+" "+event);
 				Status transactionStatus = Status.SUCCESS;
-				if(random.nextBoolean()){
-					transactionStatus= Status.FAILURE;
+				if (random.nextBoolean()) {
+					transactionStatus = Status.FAILURE;
 				}
-				
-				Transaction transaction = new TransactionBuilder().event(event).transactionID(transactionID).transactionStatus(transactionStatus).build();
+
+				Transaction transaction = new TransactionBuilder().event(event).transactionID(transactionID)
+						.time(System.currentTimeMillis()+"").log("log").transactionStatus(transactionStatus).build();
 				System.out.println(transaction);
 				transactions.add(transaction);
 			}
@@ -212,11 +213,27 @@ public class DataSetGenerator {
 		return transactions;
 	}
 	
-		
+	public static void generateDataSet(){
+		for (int i = 0; i < 50; i++) {
+			try {
+				File dir = new File("src/com/geet/mining/input/issue_"+i);
+				if (!dir.exists()) {
+					System.out.println(dir.mkdir());;
+				}
+				FileWriter fileWriter = new FileWriter(new File(dir.getAbsolutePath()+"/logs.txt"));
+				List<Transaction> transactions = new DataSetGenerator().executeRandomTransactions();
+				for (Transaction transaction : transactions) {
+					System.out.println(transaction);
+					fileWriter.write(transaction+"\n");
+				}
+				fileWriter.close();
+				System.out.println(transactions.size());
+			} catch (IOException e) {
+				e.printStackTrace();
+			}			
+		}
+	}
 	public static void main(String[] args) {
-		DataSetGenerator dataSetGenerator = new DataSetGenerator();
-		Issue issue = new Issue(dataSetGenerator.executeRandomTransactions());
-		System.out.println("Signatures");
-		System.out.println(issue.toDocumentRepresentation());
+		generateDataSet();
 	}
 }

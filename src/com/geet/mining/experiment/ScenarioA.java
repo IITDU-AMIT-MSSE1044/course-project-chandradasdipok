@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.geet.mining.model.Issue;
+import com.geet.mining.model.Transaction;
 
 /**
  * 
@@ -25,7 +26,7 @@ public class ScenarioA extends Scenario{
 	public List<Issue> getHistoricalIssues(int index) {
 		List<Issue> historicalIssues = new ArrayList<Issue>();
 		for (int i = 0; i<index && i < allIssues.size(); i++) {
-			historicalIssues.add(allIssues.get(i));
+			historicalIssues.add(new Issue(Transaction.toCloneTransactions(allIssues.get(i).getTransactions())));
 		}
 		return historicalIssues;
 	}

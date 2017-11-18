@@ -1,16 +1,13 @@
-package com.geet.mining.concept_analysis;
+package com.geet.mining.experiment;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
-import java.util.Set;
 
 import com.geet.mining.model.Event;
 import com.geet.mining.model.Issue;
-import com.geet.mining.model.Node;
 import com.geet.mining.model.Status;
 import com.geet.mining.model.Transaction;
 import com.geet.mining.model.TransactionModule;
@@ -23,37 +20,26 @@ import com.geet.mining.model.Transaction.TransactionBuilder;
  */
 public class InputHandler {
 
-	public Issue issue;
-	private boolean [][] CONTEXT_TABLE;
-
+	private List<Transaction> transactions;
 	
-	/*public boolean readIssueFromTransactionModules(List<TransactionModule>modules){
-		issue = new Issue();
-		for (TransactionModule module : modules) {
-			issue.getEvents().addAll(Event.getClonedEvents(module.eventSet));
-			issue.setFail(issue.getFail()+module.fail);
-			issue.setSucceed(issue.getSucceed()+module.succeed);
-			issue.getTransactionModules().put(module.transactionID, module);
-		}
-		setContextTable();
-		printContextTable();
-		System.out.println(issue.getEvents());
-		return false;
-	}
-	*/
 	// read each issue from an directory
-	public boolean readIssueFromDirectory(String dirPath){
-		issue = new Issue();
-		readTransactionsFromFile(dirPath+"/logs.txt");
-		readHealingActionFromFile(dirPath+"/heal.txt");
-		setContextTable();
-		printContextTable();
-		return false;
+	public Issue readIssueFromDirectory(String dirPath){
+		transactions = new ArrayList<Transaction>();
+		if (readTransactionsFromFile(dirPath+"/logs.txt") && readHealingActionFromFile(dirPath+"/heal.txt")) {
+			Issue issue = new Issue(Transaction.toCloneTransactions(getTransactions()));
+			return issue;
+		}else{
+			System.err.println("Errrr");
+			System.err.println(dirPath+"/logs.txt");
+			System.exit(0);
+		}
+		return new Issue();
 	}
 	
 	// read issue's healing action from file
+	// Now the healing action file is ignored
 	private boolean readHealingActionFromFile(String healFilePath){
-		return false;
+		return true;
 	}
 	
 	// read transactions
@@ -66,54 +52,39 @@ public class InputHandler {
 				String tokens[] = inputScanner.nextLine().split(",");
 				if (tokens.length==5) {
 					TransactionBuilder transactionBuilder = new TransactionBuilder();
-					if (tokens[4].startsWith("0")) {
+					if (tokens[4].startsWith("FAILURE")) {
 						transactionBuilder.transactionStatus(Status.FAILURE);
 					}else{
 						transactionBuilder.transactionStatus(Status.SUCCESS);						
 					}
 					transactionBuilder.time(tokens[0]).event(new Event(tokens[1])).transactionID(tokens[2]).log(tokens[3]);
 					Transaction transaction = transactionBuilder.build();
-					issue.getTransactions().add(transaction);
-					setTransactionModules(transaction);
+					getTransactions().add(transaction);
 				}
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
+			return false;
 		}
 		finally{
 			inputScanner.close();
 		}
-		return false;
+		return true;
 	}
 	
-	// set transaction modules
-	private  void setTransactionModules(Transaction transaction){
-		TransactionModule transactionModule = null;
-		if (issue.getTransactionModules().containsKey(transaction.getTransactionID())) {
-			transactionModule = issue.getTransactionModules().get(transaction.getTransactionID());
-		} else {
-			transactionModule = new TransactionModule();
-			transactionModule.transactionID = (transaction.getTransactionID());
-		}
-		transactionModule.eventSet.add(transaction.getEvent());
-		if (transaction.getTransactionStatus() == Status.FAILURE) {
-			transactionModule.fail++;
-			issue.setFail(issue.getFail()+1);
-		} else {
-			transactionModule.succeed++;
-			issue.setSucceed(issue.getSucceed()+1);
-		}
-		// set the full event set
-		if (!issue.getEvents().contains(transaction.getEvent())) {
-			issue.getEvents().add(transaction.getEvent());
-		}
-		// set the transaction types
-		issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
-		
+	public List<Transaction> getTransactions() {
+		return transactions;
 	}
+
+	public void setTransactions(List<Transaction> transactions) {
+		this.transactions = transactions;
+	}
+
+	/*
+	 * Deprecated Fields and Methods
+	 */
 	
-	
-	
+	@Deprecated
 	// build the context table
 	private  void setContextTable(){
 		CONTEXT_TABLE = new boolean [issue.getTransactionModules().size()][issue.getEvents().size()];
@@ -141,8 +112,8 @@ public class InputHandler {
 				}
 			}
 		}
-	}
-	
+	}	
+	@Deprecated
 	private void printContextTable(){
 		System.out.println(issue.getEvents().toString());
 		System.out.println(issue.getTransactionModules().keySet().toString());
@@ -153,11 +124,64 @@ public class InputHandler {
 			}
 			System.out.println();
 		}
-	}	
+	}
+	@Deprecated
+	private boolean [][] CONTEXT_TABLE;
+	@Deprecated
+	private Issue issue;
+	public Issue getIssue() {
+		return issue;
+	}
+
+	public void setIssue(Issue issue) {
+		this.issue = issue;
+	}
+
+	@Deprecated
+	public boolean readIssueFromTransactionModules(List<TransactionModule>modules){
+		issue = new Issue();
+		for (TransactionModule module : modules) {
+			issue.getEvents().addAll(Event.getClonedEvents(module.eventSet));
+			issue.setFail(issue.getFail()+module.fail);
+			issue.setSucceed(issue.getSucceed()+module.succeed);
+			issue.getTransactionModules().put(module.transactionID, module);
+		}
+		setContextTable();
+		printContextTable();
+		System.out.println(issue.getEvents());
+		return false;
+	}
+	
+	@Deprecated
+	// set transaction modules
+	private void setTransactionModules(Transaction transaction) {
+		TransactionModule transactionModule = null;
+		if (issue.getTransactionModules().containsKey(transaction.getTransactionID())) {
+			transactionModule = issue.getTransactionModules().get(transaction.getTransactionID());
+		} else {
+			transactionModule = new TransactionModule();
+			transactionModule.transactionID = (transaction.getTransactionID());
+		}
+		transactionModule.eventSet.add(transaction.getEvent());
+		if (transaction.getTransactionStatus() == Status.FAILURE) {
+			transactionModule.fail++;
+			issue.setFail(issue.getFail() + 1);
+		} else {
+			transactionModule.succeed++;
+			issue.setSucceed(issue.getSucceed() + 1);
+		}
+		// set the full event set
+		if (!issue.getEvents().contains(transaction.getEvent())) {
+			issue.getEvents().add(transaction.getEvent());
+		}
+		// set the transaction types
+		issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
+
+	}
+
 	public static void main(String[] args) {
 		InputHandler context = new InputHandler();
-		context.readIssueFromDirectory("src/com/geet/mining/input/issue_01/");
-		
+		context.readIssueFromDirectory("src/com/geet/mining/input/issue_1/");
 	}
 
 }

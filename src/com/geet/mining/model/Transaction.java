@@ -109,7 +109,7 @@ public class Transaction {
 	
 	@Override
 	public String toString() {
-		return event+","+transactionID+","+transactionStatus;
+		return time+","+event+","+transactionID+","+log+","+transactionStatus;
 	}
 	
 }
