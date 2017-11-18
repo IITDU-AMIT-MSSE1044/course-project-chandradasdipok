@@ -78,7 +78,7 @@ public class Issue implements Comparable<Issue> {
 		System.out.println("Generating Signatures...");
 		signatures = new HashMap<Event,Double>();
 		for (String key : getEvents().keySet()) {
-			signatures.put(getEvents().get(key), getEvents().get(key).getFailureProbabibilty());
+			signatures.put(getEvents().get(key), getEvents().get(key).getAvgMutualInformation(this));
 		}
 	}
 	

@@ -114,7 +114,45 @@ public class Event implements Comparable<Event>, Cloneable {
 		this.success = success;
 	}
 	
-	public double getFailureProbabibilty(){
-		return (double)getFailure()/(getFailure()+getSuccess());
+	
+	public double getAvgMutualInformation(Issue issue){
+		double avgI = 0.0;
+		
+		double pY1 = issue.getFail();
+		pY1 /= issue.getFail()+issue.getSucceed();
+		
+		double pY0 = issue.getSucceed();
+		pY0 /= issue.getFail()+issue.getSucceed();
+		int A=getFailure(), B=getSuccess(), C=issue.getFail()-getFailure(), D=issue.getSucceed()-getSuccess(),N=issue.getFail()+issue.getSucceed();
+		
+		/*
+		 * -------------------------
+		 * 		|  Y=1	 |  Y=0	   |
+		 * -------------------------
+		 * 	e=1	|  x(A)	 |  y(B)   |
+		 * -------------------------
+		 * 	e=0	| n-x(C) |  m-y(D) |
+		 */
+		double iEvtY1 = getMutualInformation(A, B, C, D, N);
+		
+		double IEvtY0 = getMutualInformation(B, A, D, C, N);
+		
+		avgI += pY1*iEvtY1;
+		avgI += pY0*IEvtY0;
+		
+		return avgI;
 	}
+	
+	private double getMutualInformation(int A, int B, int C, int D, int N){
+		if (A ==0 || B==0 || C==0 || D==0 || N==0) {
+			return 0.0;
+		}
+		double I = A*N;
+		I /=(A+B);
+		I /=(A+C);
+		I = Math.log10(I);
+		I /= Math.log10(2.0);
+		return I;
+	}
+	
 }

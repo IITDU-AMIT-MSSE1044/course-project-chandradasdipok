@@ -17,7 +17,7 @@ public class Experiment {
 	*/
 		InputHandler inputHandler = new InputHandler();
 		Issue issue1 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_0/logs.txt");
-		Issue issue2 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_1/logs.txt");
+		Issue issue2 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_3/logs.txt");
 		
 		System.out.println("Issue11111111111111111111");
 		System.out.println(issue1.toDocumentRepresentation());
