@@ -1,20 +1,11 @@
-02/08/2012,a,9d959c,Request # entering,0
-02/08/2012,b,9d959c,created cookie handler with,0
-02/08/2012,a,7d467b,Request $ entering,0
-02/08/2012,c,9d959c,cookie with name '*' was read,0  
-02/08/2012,x1,7d467b,SQL server * failover detected,0 
-02/08/2012,x1,7d467b,SQL server * failover detected ,0
-02/08/2012,x2,7d467b,$ is not sign ,0
-02/08/2012,x3,7d467b,Building authentication url,0
-02/08/2012,d,9d959c,Site=/*/*/ ,0
-02/08/2012,x4,7d467b,attempt to create a sign ,0
-02/08/2012,e,9d959c,Detected use of * from  ,0
-02/08/2012,b,7d467b,created cookie handler with,0 
-02/08/2012,x5,7d467b,writing cookie of $,0
-02/08/2012,x6,7d467b,cookie of $ was not present.,0
-02/08/2012,y1,9d959c,SqlException: server * was not,0  
-02/08/2012,z,9d959c,# leaving monitored scope of  ,0
-02/08/2012,x7,7d467b,$ does not require ssl.,0
-02/08/2012,x8,7d467b,redirecting $ to,0
-02/08/2012,x2,7d467b,$ is not sign ,0
-02/08/2012,z,7d467b,$leaving monitored scope of  ,0
+1510989062005,a,T7,log,FAILURE
+1510989062007,b,T7,log,SUCCESS
+1510989062007,c,T7,log,FAILURE
+1510989062007,d,T7,log,FAILURE
+1510989062007,e,T7,log,FAILURE
+1510989062007,z,T7,log,SUCCESS
+1510989062007,a,T6,log,FAILURE
+1510989062007,b,T6,log,SUCCESS
+1510989062007,c,T6,log,SUCCESS
+1510989062007,d,T6,log,FAILURE
+1510989062007,e,T6,log,FAILURE
