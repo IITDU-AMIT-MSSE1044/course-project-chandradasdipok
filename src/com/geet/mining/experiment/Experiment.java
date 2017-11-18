@@ -17,8 +17,8 @@ public class Experiment {
 		System.out.println(suggestedIssuesForB.size()!=0?suggestedIssuesForB.get(0):"Empty");*/
 		
 		InputHandler inputHandler = new InputHandler();
-		Issue issue1 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_10");
-		Issue issue2 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_18");
+		Issue issue1 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_0");
+		Issue issue2 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_1");
 		
 		System.out.println("Issue11111111111111111111");
 		System.out.println(issue1.toDocumentRepresentation());

@@ -94,7 +94,12 @@ public class Issue implements Comparable<Issue> {
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
 		System.out.println("Generating Signatures...");
-		
+		// calculate all the MI
+		System.out.println("Generating Signatures...");
+		for (Node node : getNodes()) {
+			node.setMI(node.getAvgMutualInformation(this));
+			System.out.println(node);
+		}
 		for (Node currentNode : Node.clonedNodes(getNodes(),this)) {
 			// retrieve the nodes those are super concept of the current Node
 			// A node is super of current Node if the node is sub set of current Node
@@ -133,22 +138,32 @@ public class Issue implements Comparable<Issue> {
 				}
 			}
 			System.out.println("Parents :" + parentNodes);	
-			//n App2 , we do not address the weak-discrimination  phenomenon:
-			//we  first  apply  FCA and use delta events between parent and child concepts 
-			//to  define  terms  (using  grouping  information),  use  TF-IDF  as  
-			//the  weight  of  each  term,  and  finally  calculate the cosine core
-			//as the similarity metric value
-			for (Node node : parentNodes) {
-				Set<Event> setA = Event.getClonedEvents(currentNode.getClosedSet());
-				Set<Event> setB = Event.getClonedEvents(node.getClosedSet());
-				setA.removeAll(setB);
-				Term term = new Term(Event.getEventsAsString(setA), 1.0);
-				System.out.println(currentNode.getClosedSet()+"-"+node.getClosedSet()+"="+setA+":"+term.getTFWeight());
-				if (signatures.containsKey(term)) {
-					term.setTFWeight(term.getTFWeight()+1.0);
-				}
-				signatures.put(term, term.getTFWeight());
-			}
+			
+				// calculate the mutual information between current nodes and parent node
+				// and store if full fill certain criteria
+				// if the mutual information of current node is greater than zero
+				// and the difference between current node and child node is non zero
+				//if (currentNode.getMI() > 0) {
+					for (Node node : parentNodes) {
+						// DMI - Delta Mutual Information
+						if (node.getMI() > 0 && currentNode.getMI() > 0) {
+							double DMI = currentNode.getMI() - node.getMI();
+							if (DMI > 0) {
+								Set<String> events = new HashSet<String>();
+								Set<Event> suspectEvents = Event
+										.getClonedEvents(currentNode.getClosedSet());
+								suspectEvents.retainAll(Event.getClonedEvents(node
+										.getClosedSet()));
+								for (Event event : suspectEvents) {
+									events.add(event.getEventString());
+								}
+								Term term = new Term(events, DMI);
+								signatures.put(term, term.getDMIWeight());
+								System.out.println(term);
+							}						
+						}
+					}
+				//}
 		}
 	}
 	
@@ -220,14 +235,20 @@ public class Issue implements Comparable<Issue> {
 		return Math.sqrt(scalarValue);
 	}
 
-	private double getDotProduct(Issue issue) {
+	public double getDotProduct(Issue issue) {
 		double dotProduct = 0;
 		for (Term termP : this.signatures.keySet()) {
-			if (issue.signatures.containsKey(termP)) {
-				dotProduct += this.signatures.get(termP)*issue.signatures.get(termP);
+			for (Term termQ : issue.signatures.keySet()) {
+				double prd = termP.getDMIWeight() * termQ.getDMIWeight();
+				Term p = termP.toClone();
+				Term q = termQ.toClone();
+				p.getEventsAsValue().retainAll(q.getEventsAsValue());
+				prd *= p.getEventsAsValue().size();
+				
+				dotProduct += prd;
 			}
 		}
-		return dotProduct/(this.scalarValue()*issue.scalarValue());
+		return dotProduct / (this.scalarValue() * issue.scalarValue());
 	}
 
 	// set cosine similarity value between two documents

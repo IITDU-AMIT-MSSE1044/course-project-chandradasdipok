@@ -16,11 +16,11 @@ public class Term {
 	// event set
 	private Set<String>eventsAsValue;
 	//weight of term
-	private double TF_Weight;
+	private double DMI_Weight;
 	
 	public Term(Set<String> events,double weight) {
 		eventsAsValue = events;
-		TF_Weight = weight;
+		DMI_Weight = weight;
 	}
 	
 	@Override
@@ -49,12 +49,12 @@ public class Term {
 		this.eventsAsValue = eventsAsValue;
 	}
 
-	public double getTFWeight() {
-		return TF_Weight;
+	public double getDMIWeight() {
+		return DMI_Weight;
 	}
 
-	public void setTFWeight(double TFWeight) {
-		TF_Weight = TFWeight;
+	public void setDMIeight(double DMIWeight) {
+		DMI_Weight = DMIWeight;
 	}
 	
 	@Override
@@ -78,6 +78,6 @@ public class Term {
 	}
 	
 	public Term toClone() {
-		return new Term(getEventsAsValue(), TF_Weight);
+		return new Term(getEventsAsValue(), DMI_Weight);
 	}
 }
