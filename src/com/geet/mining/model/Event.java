@@ -133,12 +133,12 @@ public class Event implements Comparable<Event>, Cloneable {
 		 * -------------------------
 		 * 	e=0	| n-x(C) |  m-y(D) |
 		 */
-		double iEvtY1 = getMutualInformation(A, B, C, D, N);
+		double iEvt1Y1 = getMutualInformation(A, B, C, D, N);
 		
-		double IEvtY0 = getMutualInformation(B, A, D, C, N);
+		double IEvt0Y0 = getMutualInformation(D, C, B, A, N);
 		
-		avgI += pY1*iEvtY1;
-		avgI += pY0*IEvtY0;
+		avgI += pY1*iEvt1Y1;
+		avgI += pY0*IEvt0Y0;
 		
 		return avgI;
 	}
