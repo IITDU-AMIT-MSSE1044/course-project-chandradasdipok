@@ -27,9 +27,9 @@ public class InputHandler {
 		setTransactions(new ArrayList<Transaction>());
 		if (readTransactionsFromFile(dirPath) ) {
 			Issue issue = new Issue(Transaction.toCloneTransactions(getTransactions()));
-			for (Event event : issue.getSignatures().keySet()) {
+			/*for (Event event : issue.getSignatures().keySet()) {
 				System.out.println(event.getEventString()+","+issue.getSignatures().get(event));
-			}
+			}*/
 			return issue;
 		}else{
 			System.err.println("Errrr");
@@ -62,7 +62,7 @@ public class InputHandler {
 					}
 					transactionBuilder.time(tokens[0]).event(new Event(tokens[1])).transactionID(tokens[2]).log(tokens[3]);
 					Transaction transaction = transactionBuilder.build();
-					System.out.println(transaction);
+	//				System.out.println(transaction);
 					getTransactions().add(transaction);
 				}
 			}

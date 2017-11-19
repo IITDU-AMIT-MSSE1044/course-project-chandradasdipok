@@ -75,10 +75,12 @@ public class Issue implements Comparable<Issue> {
 	public void generateSignatures() {
 		isSigAvail=true;
 		// Print the context table
-		System.out.println("Generating Signatures...");
+		// System.out.println("Generating Signatures...");
 		signatures = new HashMap<Event,Double>();
 		for (String key : getEvents().keySet()) {
-			signatures.put(getEvents().get(key), getEvents().get(key).getAvgMutualInformation(this));
+			if (getEvents().get(key).getAvgMutualInformation(this) >= 0) {
+				signatures.put(getEvents().get(key), getEvents().get(key).getAvgMutualInformation(this));				
+			}
 		}
 	}
 	
