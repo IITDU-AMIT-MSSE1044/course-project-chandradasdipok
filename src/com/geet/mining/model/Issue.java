@@ -77,11 +77,11 @@ public class Issue implements Comparable<Issue> {
 			// set the transaction types
 			getTransactionModules().put(transaction.getTransactionID(), transactionModule);
 		}
-		System.out.println(transactions.size());
+	/*	System.out.println(transactions.size());
 		for (String key : getTransactionModules().keySet()) {
 			System.out.println(getTransactionModules().get(key));
 		}
-		generateSignatures();
+	*/	generateSignatures();
 	}
 	
 	
@@ -89,23 +89,23 @@ public class Issue implements Comparable<Issue> {
 	public void generateSignatures() {
 		isSigAvail=true;
 		// Print the context table
-		printContextTable();
+//		printContextTable();
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
-		System.out.println("Generating Signatures...");
+		//System.out.println("Generating Signatures...");
 		// calculate all the MI
-		System.out.println("Generating Signatures...");
+		//System.out.println("Generating Signatures...");
 		for (Node node : getNodes()) {
 			node.setMI(node.getAvgMutualInformation(this));
-			System.out.println(node);
+		//	System.out.println(node);
 		}
 		for (Node currentNode : Node.clonedNodes(getNodes(),this)) {
 			// retrieve the nodes those are super concept of the current Node
 			// A node is super of current Node if the node is sub set of current Node
 			// store all the super nodes as candidate nodes from the previous
 			// nodes
-			System.out.println("Current Node :" + currentNode);
+//			System.out.println("Current Node :" + currentNode);
 			Set<Node> parentNodes = new HashSet<Node>();
 			for (Node storedNode : Node.clonedNodes(getNodes(),this)) {
 				if (currentNode.isChildtOf(storedNode)) {
@@ -137,7 +137,7 @@ public class Issue implements Comparable<Issue> {
 					}
 				}
 			}
-			System.out.println("Parents :" + parentNodes);	
+//			System.out.println("Parents :" + parentNodes);	
 			
 				// calculate the mutual information between current nodes and parent node
 				// and store if full fill certain criteria
@@ -159,7 +159,7 @@ public class Issue implements Comparable<Issue> {
 								}
 								Term term = new Term(events, DMI);
 								signatures.put(term, term.getDMIWeight());
-								System.out.println(term);
+//								System.out.println(term);
 							}						
 						}
 					}
