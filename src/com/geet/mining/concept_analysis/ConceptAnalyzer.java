@@ -67,7 +67,7 @@ public class ConceptAnalyzer {
 		while (i < 100) {
 			//System.out.println("No. " + i + ": Closed Sets " + closedSet);
 			Node node = generateNodeFromAClosedSet(Event.getClonedEvents(closedSet));
-			System.out.println("No. " + i + ": Node "+node);
+//			System.out.println("No. " + i + ": Node "+node);
 			nodes.add(node);
 			if (closedSet.equals(issue.getEvents())) {
 				break;

@@ -17,16 +17,15 @@ public class Experiment {
 		System.out.println(suggestedIssuesForB.size()!=0?suggestedIssuesForB.get(0):"Empty");*/
 		
 		InputHandler inputHandler = new InputHandler();
-		Issue issue1 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_10");
-		Issue issue2 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_18");
 		
-		System.out.println("Issue11111111111111111111");
-		System.out.println(issue1.toDocumentRepresentation());
-		System.out.println("Issue22222222222222222222");
-		System.out.println(issue2.toDocumentRepresentation());
-		issue1.setCosine(issue2);
-		
-		System.out.println(issue1.getCosine());
-			
+		for (int i = 0; i < 10; i++) {
+			for (int j = 0; j < 10; j++) {
+				Issue issue1 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_"+i);
+				Issue issue2 = inputHandler.readIssueFromDirectory("src/com/geet/mining/input/issue_"+j);
+				issue1.setCosine(issue2);
+				System.out.print(issue1.getCosine()+",");
+			}
+			System.out.println();
+		}	
 	}
 }

@@ -77,10 +77,10 @@ public class Issue implements Comparable<Issue> {
 			// set the transaction types
 			getTransactionModules().put(transaction.getTransactionID(), transactionModule);
 		}
-		System.out.println(transactions.size());
-		for (String key : getTransactionModules().keySet()) {
-			System.out.println(getTransactionModules().get(key));
-		}
+//		System.out.println(transactions.size());
+//		for (String key : getTransactionModules().keySet()) {
+//			System.out.println(getTransactionModules().get(key));
+//		}
 		generateSignatures();
 	}
 	
@@ -89,18 +89,18 @@ public class Issue implements Comparable<Issue> {
 	public void generateSignatures() {
 		isSigAvail=true;
 		// Print the context table
-		printContextTable();
+//		printContextTable();
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
-		System.out.println("Generating Signatures...");
+//		System.out.println("Generating Signatures...");
 		
 		for (Node currentNode : Node.clonedNodes(getNodes(),this)) {
 			// retrieve the nodes those are super concept of the current Node
 			// A node is super of current Node if the node is sub set of current Node
 			// store all the super nodes as candidate nodes from the previous
 			// nodes
-			System.out.println("Current Node :" + currentNode);
+//			System.out.println("Current Node :" + currentNode);
 			Set<Node> parentNodes = new HashSet<Node>();
 			for (Node storedNode : Node.clonedNodes(getNodes(),this)) {
 				if (currentNode.isChildtOf(storedNode)) {
@@ -132,7 +132,7 @@ public class Issue implements Comparable<Issue> {
 					}
 				}
 			}
-			System.out.println("Parents :" + parentNodes);	
+//			System.out.println("Parents :" + parentNodes);	
 			//n App2 , we do not address the weak-discrimination  phenomenon:
 			//we  first  apply  FCA and use delta events between parent and child concepts 
 			//to  define  terms  (using  grouping  information),  use  TF-IDF  as  
@@ -143,7 +143,7 @@ public class Issue implements Comparable<Issue> {
 				Set<Event> setB = Event.getClonedEvents(node.getClosedSet());
 				setA.removeAll(setB);
 				Term term = new Term(Event.getEventsAsString(setA), 1.0);
-				System.out.println(currentNode.getClosedSet()+"-"+node.getClosedSet()+"="+setA+":"+term.getTFWeight());
+//				System.out.println(currentNode.getClosedSet()+"-"+node.getClosedSet()+"="+setA+":"+term.getTFWeight());
 				if (signatures.containsKey(term)) {
 					term.setTFWeight(term.getTFWeight()+1.0);
 				}
