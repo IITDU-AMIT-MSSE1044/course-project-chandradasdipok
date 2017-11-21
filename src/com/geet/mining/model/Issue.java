@@ -24,7 +24,7 @@ public class Issue implements Comparable<Issue> {
 	// the signatures of an issue
 	// the collection of terms
 	// where term is also collection of events with weight in DMI
-	// <Term,Double> := <Event Set,  weight>
+	// <Event,Double> := <Event,  weight>
 	// and We
 	private Map<Event, Double> signatures;
 	
@@ -47,9 +47,7 @@ public class Issue implements Comparable<Issue> {
 			Event event = null;
 			if (getEvents().containsKey(transaction.getEvent().getEventString())) {
 				event = getEvents().get(transaction.getEvent().getEventString());
-			//	System.out.println("Yes");
 			} else {
-			//	System.out.println("No");
 				event = new Event(transaction.getEvent().getEventString());
 			}
 			if (transaction.getTransactionStatus() == Status.FAILURE) {
@@ -59,14 +57,8 @@ public class Issue implements Comparable<Issue> {
 				event.setSuccess(event.getSuccess()+1);;
 				setSucceed(getSucceed()+1);
 			}
-			//System.out.println(event);
-			// set the transaction types
 			getEvents().put(transaction.getEvent().getEventString(), event);
 		}
-		/*System.out.println(transactions.size());
-		for (String key : getEvents().keySet()) {
-			System.out.println(getEvents().get(key).getEventString()+","+getEvents().get(key).getFailure()+":"+getEvents().get(key).getSuccess());
-		}*/
 		generateSignatures();
 	}
 	
@@ -74,8 +66,6 @@ public class Issue implements Comparable<Issue> {
 	// generate the signatures for the given issue
 	public void generateSignatures() {
 		isSigAvail=true;
-		// Print the context table
-		// System.out.println("Generating Signatures...");
 		signatures = new HashMap<Event,Double>();
 		for (String key : getEvents().keySet()) {
 			signatures.put(getEvents().get(key), getEvents().get(key).getFailureProbabibilty());
@@ -173,6 +163,4 @@ public class Issue implements Comparable<Issue> {
 	public void setSignatures(Map<Event, Double> signatures) {
 		this.signatures = signatures;
 	}
-
-
 }
