@@ -50,23 +50,7 @@ public class Event implements Comparable<Event>,Cloneable{
 		return eventString;
 	}
 	
-	public static void main(String[] args) {
-		Set<Event> events = new HashSet<Event>();
-		Event e1 = new Event("a");
-		System.out.println(e1+","+e1.hashCode());
-		Event e2 = new Event("a");
-		System.out.println(e2+","+e2.hashCode());
-		Event e4 = new Event("a");
-		System.out.println(events.add(e1));
-		System.out.println(events.add(e2));
-		System.out.println(events.add(e4));
-		System.out.println(events.toString());
-		
-		System.out.println("a".compareTo("b"));
-		
-		
-	}
-
+	
 	@Override
 	public int compareTo(Event o) {
 		return (value-o.value);

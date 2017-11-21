@@ -25,7 +25,7 @@ public class InputHandler {
 	// read each issue from an directory
 	public Issue readIssueFromDirectory(String dirPath){
 		transactions = new ArrayList<Transaction>();
-		if (readTransactionsFromFile(dirPath+"/logs.txt") && readHealingActionFromFile(dirPath+"/heal.txt")) {
+		if (readTransactionsFromFile(dirPath)) {
 			Issue issue = new Issue(Transaction.toCloneTransactions(getTransactions()));
 			return issue;
 		}else{
@@ -178,10 +178,4 @@ public class InputHandler {
 		issue.getTransactionModules().put(transaction.getTransactionID(), transactionModule);
 
 	}
-
-	public static void main(String[] args) {
-		InputHandler context = new InputHandler();
-		context.readIssueFromDirectory("src/com/geet/mining/input/issue_1/");
-	}
-
 }
