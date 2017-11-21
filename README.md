@@ -71,7 +71,7 @@ Prerequisites : Git, Java(TM) SE Runtime Environment (build 1.8.0_131-b11), Ecpl
 2. Go to [Experiment.java](https://github.com/IITDU-AMIT-MSSE1044/course-project-chandradasdipok/blob/proposed/src/com/geet/mining/experiment/Experiment.java) and </b>Run</b> the file.
 
 #### 4.3 Output
-In each case, a Contigency Table of issue's similarity score will be shown in the output as follows:
+In each case, a Contingency Table of issue's similarity score will be shown in the output as follows:
 `````````
 1.0,0.38416284034898157,0.260750569764919,0.5462313816629312,0.13050936413860945,0.5304810496221232,0.36298781168106387,0.08863336205058582,0.2992272207474969,0.4603566989034448,
 0.38416284034898157,1.0,0.5252752148636969,0.4630407553359154,0.34492937580539645,0.20179359598372845,0.3042909968972491,0.45234179077180203,0.5645367946463894,0.3163666481075452,
