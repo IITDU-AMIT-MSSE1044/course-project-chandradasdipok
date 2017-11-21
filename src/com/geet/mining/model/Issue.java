@@ -47,9 +47,7 @@ public class Issue implements Comparable<Issue> {
 			Event event = null;
 			if (getEvents().containsKey(transaction.getEvent().getEventString())) {
 				event = getEvents().get(transaction.getEvent().getEventString());
-			//	System.out.println("Yes");
 			} else {
-			//	System.out.println("No");
 				event = new Event(transaction.getEvent().getEventString());
 			}
 			if (transaction.getTransactionStatus() == Status.FAILURE) {
@@ -59,14 +57,8 @@ public class Issue implements Comparable<Issue> {
 				event.setSuccess(event.getSuccess()+1);;
 				setSucceed(getSucceed()+1);
 			}
-			//System.out.println(event);
-			// set the transaction types
 			getEvents().put(transaction.getEvent().getEventString(), event);
 		}
-		/*System.out.println(transactions.size());
-		for (String key : getEvents().keySet()) {
-			System.out.println(getEvents().get(key).getEventString()+","+getEvents().get(key).getFailure()+":"+getEvents().get(key).getSuccess());
-		}*/
 		generateSignatures();
 	}
 	
@@ -175,6 +167,4 @@ public class Issue implements Comparable<Issue> {
 	public void setSignatures(Map<Event, Double> signatures) {
 		this.signatures = signatures;
 	}
-
-
 }

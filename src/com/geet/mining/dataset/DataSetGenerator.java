@@ -184,7 +184,7 @@ public class DataSetGenerator {
 
 	
 	// randomly execute transactions and results
-	private List<Transaction> executeRandomTransactions(){
+	public List<Transaction> executeRandomTransactions(){
 		// transactionID to be random but belongs to transaction modules type
 		// transaction event to random but belongs to that transaction module type
 		// transaction status to be random either 0 or 1 referring success or failure 
@@ -202,7 +202,6 @@ public class DataSetGenerator {
 				if (random.nextBoolean()) {
 					transactionStatus = Status.FAILURE;
 				}
-
 				Transaction transaction = new TransactionBuilder().event(event).transactionID(transactionID)
 						.time(System.currentTimeMillis()+"").log("log").transactionStatus(transactionStatus).build();
 				System.out.println(transaction);

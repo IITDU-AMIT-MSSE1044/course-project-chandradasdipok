@@ -63,7 +63,6 @@ public class HealingAction {
 	}
 	
 	
-	
 	// getters 
 	public String getVerb() {
 		return verb;
@@ -76,13 +75,5 @@ public class HealingAction {
 	}
 	public String getDescription() {
 		return description;
-	}
-	
-	
-	public static void main(String[] args) {
-		for (HealingAction healingAction : HealingAction.rules) {
-			System.out.println(healingAction.toTripleStructure());
-		}
-	}
-	
+	}	
 }
