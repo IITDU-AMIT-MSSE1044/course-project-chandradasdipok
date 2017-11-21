@@ -36,20 +36,6 @@ public class ConceptAnalyzer {
 			}
 			i++;
 		}
-	//
-		/*
-		for (Event event : issue.getEvents()) {
-			System.out.println(event.getEventString()+","+event.getValue());
-		}
-		System.out.println("Transactions");
-		for (String moduleKey : issue.getTransactionModules().keySet()) {
-			System.out.println(moduleKey);
-			for (Event evt : issue.getTransactionModules().get(moduleKey).eventSet) {
-				System.out.println(evt.getEventString()+","+evt.getValue());
-			}
-		}
-	//*/
-
 	}
 
 	// Generate all the nodes of fca graph of an issue
@@ -58,16 +44,10 @@ public class ConceptAnalyzer {
 	public Set<Node> generateNodesOfGraph() {
 		Set<Node> nodes = new HashSet<Node>();
 		List<Event> attributes = new ArrayList<>(Event.getClonedEvents(issue.getEvents()));
-		/*System.out.println("Eventsssssssss");
-		for (Event event : attributes) {
-			System.out.println(event+","+event.getValue());
-		}*/
 		Set<Event> closedSet = getFirstClosure();
 		int i = 0;
 		while (i < 1000000000) {
-			//System.out.println("No. " + i + ": Closed Sets " + closedSet);
 			Node node = generateNodeFromAClosedSet(Event.getClonedEvents(closedSet));
-//			System.out.println("No. " + i + ": Node "+node);
 			nodes.add(node);
 			if (closedSet.equals(issue.getEvents())) {
 				break;
@@ -91,20 +71,12 @@ public class ConceptAnalyzer {
 		for (int i = attributes.size() - 1; i >= 0; i--) {
 			Set<Event> nextClosedSet = new HashSet<Event>();
 			Event m = attributes.get(i);
-//			System.out.println("Closed Set "+closedSet);
-//			System.out.println("Element "+m);
 			if (closedSet.contains(m)) {
 				closedSet.remove(m);
-//				System.out.println("Closed Set after remove "+closedSet);
 			} else {
 				nextClosedSet.addAll(closedSet);
 				nextClosedSet.add(m);
-//				System.out.println("Next Closed Set "+nextClosedSet);
-				// System.out.println("Total Events "+issue.getEvents());
-				// System.out.println("Closures:
-				// "+closureOfEvents(nextClosedSet, CONTEXT_TABLE));
 				nextClosedSet = closureOfEvents(nextClosedSet);
-//				System.out.println("Closures of Next Closed Set "+nextClosedSet);
 				if (!hasLessThanElementM(Event.getClonedEvents(nextClosedSet), Event.getClonedEvents(closedSet), m)) {
 					return nextClosedSet;
 				}else{
@@ -157,18 +129,12 @@ public class ConceptAnalyzer {
 	// detect whether there is difference between closed set and
 	// next closed set less than m
 	private boolean hasLessThanElementM(Set<Event> nextClosedSet, Set<Event> closedSet, Event eventM) {
-		// System.out.println("Element Check "+eventM);
-		// System.out.println(nextClosedSet);
-		// System.out.println(closedSet);
 		Set<Event> diff = nextClosedSet;
 		diff.removeAll(closedSet);
-		// System.out.println(diff);
 		// if has elements less than eventM
 		// return true
 		// else return false
 		for (Event event : diff) {
-			//if (eventM.getEventString().compareTo(event.getEventString()) > 0) {
-			//System.out.println(eventM.getValue()+","+event.getValue());
 			if(eventM.getValue() > event.getValue()){
 				// System.out.println("Smallest New Element "+ event);
 				return true;
@@ -183,13 +149,11 @@ public class ConceptAnalyzer {
 		generatedNode.setClosedSet(closedSet);
 		for (String moduleKey : issue.getTransactionModules().keySet()) {
 			TransactionModule transactionModule = issue.getTransactionModules().get(moduleKey);
-			// System.out.println(transactionModule.toString());
 			if (transactionModule.eventSet.containsAll(closedSet)) {
 				generatedNode.setSucceed(generatedNode.getSucceed() + transactionModule.succeed);
 				generatedNode.setFail(generatedNode.getFail() + transactionModule.fail);
 			}
 		}
-		// System.out.println(generatedNode);
 		return generatedNode;
 	}
 

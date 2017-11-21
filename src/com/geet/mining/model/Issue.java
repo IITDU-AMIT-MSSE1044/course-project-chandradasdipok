@@ -77,40 +77,29 @@ public class Issue implements Comparable<Issue> {
 			// set the transaction types
 			getTransactionModules().put(transaction.getTransactionID(), transactionModule);
 		}
-	/*	System.out.println(transactions.size());
-		for (String key : getTransactionModules().keySet()) {
-			System.out.println(getTransactionModules().get(key));
-		}
-	*/	generateSignatures();
+		generateSignatures();
 	}
 	
 	
 	// generate the signatures for the given issue
 	public void generateSignatures() {
 		isSigAvail=true;
-		// Print the context table
-//		printContextTable();
 		ConceptAnalyzer conceptAnalyzer = new ConceptAnalyzer(this);
 		// generate  the nodes of a FCA graph
 		setNodes(conceptAnalyzer.generateNodesOfGraph());
 		//System.out.println("Generating Signatures...");
-		// calculate all the MI
-		//System.out.println("Generating Signatures...");
 		for (Node node : getNodes()) {
 			node.setMI(node.getAvgMutualInformation(this));
-		//	System.out.println(node);
 		}
 		for (Node currentNode : Node.clonedNodes(getNodes(),this)) {
 			// retrieve the nodes those are super concept of the current Node
 			// A node is super of current Node if the node is sub set of current Node
 			// store all the super nodes as candidate nodes from the previous
 			// nodes
-//			System.out.println("Current Node :" + currentNode);
 			Set<Node> parentNodes = new HashSet<Node>();
 			for (Node storedNode : Node.clonedNodes(getNodes(),this)) {
 				if (currentNode.isChildtOf(storedNode)) {
 					// add stored node to parent nodes
-					// System.out.println(currentNode+" is child of "+storedNode);
 					// // check whether stored node is present as subset in
 					// parent nodes
 					boolean isStoredNodePresentAsParent = false;
@@ -137,33 +126,29 @@ public class Issue implements Comparable<Issue> {
 					}
 				}
 			}
-//			System.out.println("Parents :" + parentNodes);	
 			
 				// calculate the mutual information between current nodes and parent node
 				// and store if full fill certain criteria
 				// if the mutual information of current node is greater than zero
 				// and the difference between current node and child node is non zero
-				//if (currentNode.getMI() > 0) {
 					for (Node node : parentNodes) {
 						// DMI - Delta Mutual Information
-						if (node.getMI() > 0 && currentNode.getMI() > 0) {
+						if (node.getMI() > 0) {
 							double DMI = currentNode.getMI() - node.getMI();
 							if (DMI > 0) {
 								Set<String> events = new HashSet<String>();
 								Set<Event> suspectEvents = Event
 										.getClonedEvents(currentNode.getClosedSet());
-								suspectEvents.retainAll(Event.getClonedEvents(node
+								suspectEvents.removeAll(Event.getClonedEvents(node
 										.getClosedSet()));
 								for (Event event : suspectEvents) {
 									events.add(event.getEventString());
 								}
 								Term term = new Term(events, DMI);
 								signatures.put(term, term.getDMIWeight());
-//								System.out.println(term);
 							}						
 						}
 					}
-				//}
 		}
 	}
 	
@@ -248,6 +233,7 @@ public class Issue implements Comparable<Issue> {
 				dotProduct += prd;
 			}
 		}
+		dotProduct /= (this.scalarValue() * issue.scalarValue());
 		return dotProduct / (this.scalarValue() * issue.scalarValue());
 	}
 
