@@ -94,11 +94,14 @@ The data are prepared randomly by as much as possible. The project don't impleme
 ## 6. Helpful Links
 
 * For Construction Formal Concept Analysis
-  ** [Formal Concept Analysis] (http://www.math.tu-dresden.de/~ganter/psfiles/FingerExercises.pdf) 
+  ** [Formal Concept Analysis](http://www.math.tu-dresden.de/~ganter/psfiles/FingerExercises.pdf) 
   ** [Two basic algorithms in concept analysis](https://link.springer.com/chapter/10.1007%2F978-3-642-11928-6_22?LI=true) 
   ** [Coursera Lecture](https://www.coursera.org/learn/formal-concept-analysis/lecture/jI7Ne/closures-in-lectic-order)
 * For Mutual Information
   ** [Information Gain](https://www.autonlab.org/_media/tutorials/infogain11.pdf)
   ** [Mutual Information](http://www.surdeanu.info/mihai/teaching/ista555-spring15/readings/yang97comparative.pdf)
+
+## 7. Challenges
+The main challenge to implement the proposed approach is to extract the Formal Concepts using Formal Concept Analysis. Beacuse of huge number of objects and huge number of attributes represented by transactions and events respectively, the number of Formal Concepts can be huge. The best approach to construct the formal concept is "Next Closure Algorithm" proposed by Ganter. The time complexity for generating all formal concepts is O(|G||C||M|) where G is objects, M is attributes, and C is formal concepts. The alogorithm is implemented in [chandradasdipok/formal_concept_analysis](https://github.com/chandradasdipok/formal_concept_analysis). The implementation is also a by-product of this project.
 
 
